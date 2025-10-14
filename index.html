@@ -3,166 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vipul Sharma | Tech Lead</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: #fff;
-            padding: 20px 40px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2 {
-            color: #2c3e50;
-        }
-        h1 {
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-        }
-        .contact-info {
-            font-size: 0.9em;
-            color: #7f8c8d;
-            margin-bottom: 20px;
-        }
-        .section {
-            margin-bottom: 30px;
-        }
-        .experience-item {
-            margin-bottom: 20px;
-            border-left: 3px solid #3498db;
-            padding-left: 15px;
-        }
-        .tech-stack {
-            font-size: 0.9em;
-            color: #555;
-            font-style: italic;
-        }
-        .work-in-progress-banner {
-            background-color: #f39c12; /* A strong, visible color like orange */
-            color: white;
-            text-align: center;
-            padding: 10px;
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        ul li {
-            background: #ecf0f1;
-            padding: 8px 12px;
-            margin-bottom: 5px;
-            border-radius: 4px;
-        }
-    </style>
+    <title>Vipul Sharma - Software Engineer Portfolio</title>
+    <meta name="description" content="Vipul Sharma - Passionate Software Engineer with expertise in full-stack development, Java, React, and cloud technologies.">
+    <meta name="keywords" content="Software Engineer, Java Developer, React Developer, Full Stack, Vipul Sharma">
+    <meta name="author" content="Vipul Sharma">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="public/assets/images/favicon.ico">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="src/css/main.css">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="public/assets/images/vipul-sharma.png" as="image">
 </head>
 <body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-brackets">&lt;/&gt;</span>
+                <span class="logo-text">Vipul Sharma</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#experience" class="nav-link">Experience</a></li>
+                <li><a href="#skills" class="nav-link">Skills</a></li>
+                <li><a href="src/pages/tools.html" class="nav-link">Tools</a></li>
+                <li><a href="src/pages/ai.html" class="nav-link">AI</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
 
-<div class="container">
-    <header>
-        <h1>Vipul Sharma</h1>
-        <p>Tech Lead | Java, Spring Boot, Microservices | Distributed Systems | AWS</p>
-        <p class="contact-info">
-            Toronto, Ontario | +1 (437) 908-2730 | isharmavipul@gmail.com | <a href="https://linkedin.com/in/ivipulsharma" target="_blank">linkedin.com/in/ivipulsharma</a>
-        </p>
-    </header>
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-greeting">
+                        <span class="greeting-line"></span>
+                        <span class="greeting-text">Nice to meet you,</span>
+                    </div>
+                    <h1 class="hero-title">I'm Vipul Sharma</h1>
+                    <p class="hero-description">
+                        Passionate Software Engineer with expertise in full-stack development, 
+                        specializing in Java, React, and cloud technologies. Currently working as 
+                        a Software Development Engineer at Kotak Mahindra Bank, building scalable 
+                        fintech solutions and mentoring junior developers.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">9</span>
+                            <span class="stat-label">Years of<br>experience</span>
+                        </div>
+                        <div class="stat-divider">+</div>
+                        <div class="stat-item">
+                            <span class="stat-number">13</span>
+                            <span class="stat-label">Projects<br>completed</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="public/assets/images/vipul-sharma.png" alt="Vipul Sharma - Software Engineer" class="hero-photo">
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <hr>
- <div class="work-in-progress-banner">
-        WORK IN PROGRESS 🚧
-    </div>
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="about-container">
+            <div class="about-content">
+                <div class="about-left">
+                    <div class="section-header">
+                        <span class="section-line"></span>
+                        <h2 class="section-title">I'm Vipul, a<br>Software Engineer</h2>
+                    </div>
+                    <p class="about-description">
+                        B.Tech graduate in Computer Science from Manav Rachna College of Engineering. 
+                        Currently working at Kotak Mahindra Bank as SDE II, with expertise in 
+                        Java, React, Spring Boot, and cloud technologies. Passionate about building 
+                        scalable solutions and exploring new technologies.
+                    </p>
+                    <a href="#contact" class="learn-more-btn">GET IN TOUCH →</a>
+                </div>
+                <div class="about-right">
+                    <div class="about-details">
+                        <div class="collapsible-section">
+                            <h3 class="collapsible-header about-subtitle" data-target="education">
+                                EDUCATION <span class="toggle-icon">+</span>
+                            </h3>
+                            <div class="collapsible-content" id="education">
+                                <p class="about-text">
+                                    <strong>B.Tech in Computer Science & Engineering</strong><br>
+                                    Manav Rachna College of Engineering, Faridabad (2012-2016)<br>
+                                    <strong>12th CBSE:</strong> New Green Field Public School, New Delhi<br>
+                                    <strong>10th CBSE:</strong> St. Mary's Public School, New Delhi
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="collapsible-section">
+                            <h3 class="collapsible-header about-subtitle" data-target="skills">
+                                TECHNICAL SKILLS <span class="toggle-icon">+</span>
+                            </h3>
+                            <div class="collapsible-content" id="skills">
+                                <p class="about-text">
+                                    <strong>Languages:</strong> Java, JavaScript, Python, SQL<br>
+                                    <strong>Frameworks:</strong> Spring Boot, React, Node.js<br>
+                                    <strong>Databases:</strong> MySQL, MongoDB, Oracle<br>
+                                    <strong>Tools:</strong> Git, Jenkins, Docker, AWS, Elasticsearch
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="collapsible-section">
+                            <h3 class="collapsible-header about-subtitle" data-target="certifications">
+                                CERTIFICATIONS <span class="toggle-icon">+</span>
+                            </h3>
+                            <div class="collapsible-content" id="certifications">
+                                <p class="about-text">
+                                    • Java SE 8 Programmer I Certification<br>
+                                    • AWS Cloud Practitioner<br>
+                                    • Spring Professional Certification
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="social-links">
+                            <h4>CONNECT WITH ME</h4>
+                            <div class="social-icons">
+                                <a href="mailto:rexvips1@gmail.com" class="social-icon" title="Email">@</a>
+                                <a href="https://www.linkedin.com/in/ivipulsharma" class="social-icon" title="LinkedIn" target="_blank">in</a>
+                                <a href="#" class="social-icon" title="GitHub" target="_blank">gh</a>
+                                <a href="#" class="social-icon" title="Twitter" target="_blank">tw</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="portfolio-preview">
+                        <img src="public/assets/images/portfolio-preview.png" alt="Portfolio Preview" class="portfolio-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="experience-section">
+        <div class="experience-container">
+            <div class="section-header">
+                <span class="section-line"></span>
+                <h2 class="section-title">Professional<br>Experience</h2>
+            </div>
+            
+            <div class="experience-timeline">
+                <div class="experience-item">
+                    <div class="experience-date">2021 - Present</div>
+                    <div class="experience-content">
+                        <h3 class="experience-title">Software Development Engineer II</h3>
+                        <p class="experience-company">Kotak Mahindra Bank, Gurugram</p>
+                        <div class="collapsible-section">
+                            <p class="collapsible-header experience-toggle" data-target="kotak-details">
+                                View Details <span class="toggle-icon">+</span>
+                            </p>
+                            <div class="collapsible-content" id="kotak-details">
+                                <ul class="experience-duties">
+                                    <li>Developed and maintained core banking applications using Java and Spring Boot</li>
+                                    <li>Implemented REST APIs for mobile banking and web applications</li>
+                                    <li>Optimized database queries resulting in 40% performance improvement</li>
+                                    <li>Collaborated with cross-functional teams to deliver high-quality software solutions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="experience-item">
+                    <div class="experience-date">2019 - 2021</div>
+                    <div class="experience-content">
+                        <h3 class="experience-title">Technical Lead</h3>
+                        <p class="experience-company">Paytm Payments Bank, NOIDA</p>
+                        <div class="collapsible-section">
+                            <p class="collapsible-header experience-toggle" data-target="paytm-details">
+                                View Details <span class="toggle-icon">+</span>
+                            </p>
+                            <div class="collapsible-content" id="paytm-details">
+                                <ul class="experience-duties">
+                                    <li>Led a team of 5 developers in building payment processing systems</li>
+                                    <li>Architected microservices using Spring Boot and deployed on AWS</li>
+                                    <li>Implemented real-time transaction monitoring and fraud detection</li>
+                                    <li>Mentored junior developers and conducted code reviews</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="experience-item">
+                    <div class="experience-date">2017 - 2019</div>
+                    <div class="experience-content">
+                        <h3 class="experience-title">Software Engineer</h3>
+                        <p class="experience-company">Monster.com (India) Pvt. Ltd, NOIDA</p>
+                        <div class="collapsible-section">
+                            <p class="collapsible-header experience-toggle" data-target="monster-details">
+                                View Details <span class="toggle-icon">+</span>
+                            </p>
+                            <div class="collapsible-content" id="monster-details">
+                                <ul class="experience-duties">
+                                    <li>Developed job portal features using Java and React</li>
+                                    <li>Implemented search algorithms for job matching</li>
+                                    <li>Built responsive web applications with modern JavaScript frameworks</li>
+                                    <li>Integrated third-party APIs for enhanced functionality</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills & Contact Section -->
+    <section id="skills" class="skills-section">
+        <div class="skills-container">
+            <div class="skills-header">
+                <h2 class="skills-title">Technical Expertise</h2>
+                <div class="contact-card">
+                    <h3>Let's Connect</h3>
+                    <p>Interested in collaborating? Let's discuss how we can work together 
+                       to build amazing software solutions.</p>
+                    <div class="contact-info">
+                        <a href="mailto:rexvips1@gmail.com" class="contact-item">
+                            <span class="contact-icon">✉</span>
+                            <span>rexvips1@gmail.com</span>
+                        </a>
+                        <a href="https://www.linkedin.com/in/ivipulsharma" class="contact-item" target="_blank">
+                            <span class="contact-icon">💼</span>
+                            <span>LinkedIn Profile</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="skills-content">
+                <div class="skills-categories">
+                    <div class="skill-category">
+                        <div class="collapsible-section">
+                            <h3 class="collapsible-header skill-header" data-target="backend-skills">
+                                Backend Development <span class="toggle-icon">+</span>
+                            </h3>
+                            <div class="collapsible-content" id="backend-skills">
+                                <div class="skill-items">
+                                    <span class="skill-tag">Java</span>
+                                    <span class="skill-tag">Spring Boot</span>
+                                    <span class="skill-tag">Spring MVC</span>
+                                    <span class="skill-tag">Hibernate</span>
+                                    <span class="skill-tag">JPA</span>
+                                    <span class="skill-tag">REST APIs</span>
+                                    <span class="skill-tag">Microservices</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-category">
+                        <div class="collapsible-section">
+                            <h3 class="collapsible-header skill-header" data-target="frontend-skills">
+                                Frontend Development <span class="toggle-icon">+</span>
+                            </h3>
+                            <div class="collapsible-content" id="frontend-skills">
+                                <div class="skill-items">
+                                    <span class="skill-tag">React</span>
+                                    <span class="skill-tag">JavaScript</span>
+                                    <span class="skill-tag">HTML5</span>
+                                    <span class="skill-tag">CSS3</span>
+                                    <span class="skill-tag">Redux</span>
+                                    <span class="skill-tag">Bootstrap</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-category">
+                        <div class="collapsible-section">
+                            <h3 class="collapsible-header skill-header" data-target="database-skills">
+                                Database & Cloud <span class="toggle-icon">+</span>
+                            </h3>
+                            <div class="collapsible-content" id="database-skills">
+                                <div class="skill-items">
+                                    <span class="skill-tag">MySQL</span>
+                                    <span class="skill-tag">MongoDB</span>
+                                    <span class="skill-tag">Oracle</span>
+                                    <span class="skill-tag">AWS</span>
+                                    <span class="skill-tag">Docker</span>
+                                    <span class="skill-tag">Jenkins</span>
+                                    <span class="skill-tag">Git</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recent-projects">
+                    <h3>Recent Projects</h3>
+                    <div class="project-item">
+                        <span class="project-date">2023</span>
+                        <h4>Banking Core System Enhancement</h4>
+                        <p>Microservices architecture for improved scalability</p>
+                    </div>
+                    <div class="project-item">
+                        <span class="project-date">2022</span>
+                        <h4>Real-time Payment Processing</h4>
+                        <p>High-performance transaction system with fraud detection</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     
-    <div class="container">
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="contact-container">
+            <div class="section-header">
+                <span class="section-line"></span>
+                <h2 class="section-title">Get In Touch</h2>
+            </div>
+            <p class="contact-description">
+                Ready to discuss your next project or explore collaboration opportunities? 
+                I'm always excited to work on challenging problems and innovative solutions.
+            </p>
+            <div class="contact-methods">
+                <a href="mailto:rexvips1@gmail.com" class="contact-method">
+                    <div class="contact-icon-wrapper">
+                        <span class="contact-icon-large">✉</span>
+                    </div>
+                    <h4>Email Me</h4>
+                    <p>rexvips1@gmail.com</p>
+                </a>
+                <a href="https://www.linkedin.com/in/ivipulsharma" class="contact-method" target="_blank">
+                    <div class="contact-icon-wrapper">
+                        <span class="contact-icon-large">💼</span>
+                    </div>
+                    <h4>LinkedIn</h4>
+                    <p>Professional Network</p>
+                </a>
+            </div>
         </div>
-    <div class="section">
-        <h2>Summary</h2>
-        <p>
-            Backend-focused Engineer with over 9 years of experience in designing and scaling distributed systems. Proficient in Java, Spring Boot, and microservices architecture, with hands-on experience in building core infrastructure components. Adept at collaborating with cross-functional teams to deliver high-quality solutions in agile environments. Led the decomposition of monolithic modules into microservices, integrating service mesh and centralized monitoring, resulting in improved scalability and fault isolation.
-        </p>
-    </div>
+    </section>
 
-    <div class="section">
-        <h2>Skills</h2>
-        <ul>
-            [cite_start]<li><strong>Languages:</strong> Java 8/17, SQL, Bash, Python [cite: 12]</li>
-            [cite_start]<li><strong>Frameworks:</strong> Spring Boot, Apache Spark, Executor Framework [cite: 13]</li>
-            [cite_start]<li><strong>Tools:</strong> Kafka, Jenkins, Docker, Kubernetes, Git, Grafana, Datadog [cite: 14]</li>
-            [cite_start]<li><strong>Databases:</strong> SQL, NoSQL [cite: 15]</li>
-            [cite_start]<li><strong>Cloud/DevOps:</strong> Jenkins, AWS, GCP, CI/CD, Unix Scripting [cite: 16]</li>
-            [cite_start]<li><strong>Other:</strong> Kafka, Microservices, RESTful APIs, CI/CD, System Design, Agile, Disaster Recovery [cite: 17]</li>
-        </ul>
-    </div>
-
-    <div class="section">
-        <h2>Professional Experience</h2>
-
-        <div class="experience-item">
-            <h3>Senior Tech Consultant | CGI, Toronto, ON, Canada - Client: TD Bank</h3>
-            <p>May 2025 - Present</p>
-            <ul>
-                [cite_start]<li>Designing and implementing scalable, secure solutions using Java 17, Spring Boot, and Oracle Database. [cite: 20]</li>
-                [cite_start]<li>Building robust exception handling frameworks to ensure fault tolerance and smooth recovery in failure scenarios. [cite: 21]</li>
-                [cite_start]<li>Optimized application code, concurrency, and database interactions to handle high transaction volumes. [cite: 22]</li>
-            </ul>
-            [cite_start]<p class="tech-stack">Tech Stack: Rest API, Spring boot, Java17, Microservice Architecture, Kafka, Dynatrace, SSH/SFTP [cite: 23]</p>
+                    <a href="public/assets/documents/Vipul_Sharma_Resume_Software_Engineer.docx (1).pdf" class="contact-method" download>
+                    <div class="contact-icon-wrapper">
+                        <span class="contact-icon-large">📄</span>
+                    </div>
+                    <h4>Download Resume</h4>
+                    <p>PDF Format</p>
+                </a>
+            </div>
         </div>
+    </section>
 
-        <div class="experience-item">
-            <h3>Software Development Engineer III | Kotak Mahindra Bank, Gurugram, India</h3>
-            <p>June 2024 - April 2025</p>
-            <ul>
-                [cite_start]<li>Architected Scalable Solutions for the Govt Banking Division, ensuring timely delivery through effective task delegation. [cite: 25]</li>
-                [cite_start]<li>Led agile practices to improve development workflows and project execution. [cite: 26]</li>
-                [cite_start]<li>Explored workflow-driven integrations using Camunda BPM and considered API Gateway strategies with Apigee and WSO2. [cite: 27]</li>
-            </ul>
-            [cite_start]<p class="tech-stack">Tech Stack: Rest API, Spring boot, Java17, Microservice Architecture, Kafka, Docker, Datadog, Grafana [cite: 29]</p>
-        </div>
-
-        <div class="experience-item">
-            <h3>Senior Technical Lead | Paytm Payments Banks, NOIDA</h3>
-            <p>December 2020 - June 2024</p>
-            <ul>
-                [cite_start]<li>Designed scalable, high-availability backend services with a focus on distributed systems, fault tolerance, and observability. [cite: 32]</li>
-                [cite_start]<li>Integrated and managed application observability using Datadog, Grafana, and Elastic Stack. [cite: 33]</li>
-                [cite_start]<li>Developed and deployed automation solutions for recurring operational workflows. [cite: 34]</li>
-            </ul>
-            [cite_start]<p class="tech-stack">Tech Stack: Spring boot, API Controllers, Java17, Aerospike, Kafka, Docker, Kubernetes, Jenkins, Mysql (Maria DB), MongoDB, Datadog, Grafana [cite: 36]</p>
-        </div>
-
-        <div class="experience-item">
-            <h3>Software Engineer | Monster.com (India), Noida, India</h3>
-            <p>January 2019 - December 2020</p>
-            <ul>
-                [cite_start]<li>Built a reliable data synchronization system between legacy and modern platforms using Kafka and Spring Boot. [cite: 39]</li>
-                [cite_start]<li>Designed efficient APIs for Elasticsearch schema for storing and retrieving resumes, boosting search performance. [cite: 40]</li>
-                [cite_start]<li>Developed a multi-threaded Spring Boot application to speed up indexing. [cite: 41]</li>
-            </ul>
-            [cite_start]<p class="tech-stack">Tech Stack: Spring boot, Java8, Multithreading, Kafka, Elasticsearch, Solr, Solr Tagger, Mysql (Maria DB), MongoDB [cite: 42]</p>
-        </div>
-
-        <div class="experience-item">
-            <h3>Software Developer (R&D) | Drishti Soft (Ameyo), Gurugram</h3>
-            <p>March 2018 - January 2019</p>
-            <ul>
-                [cite_start]<li>Integrated LDAP and token-based authentication to support secure access and third-party integrations. [cite: 45]</li>
-                [cite_start]<li>Built live data feeds for call center dashboards, enabling supervisors to monitor operations in real time. [cite: 46]</li>
-            </ul>
-            [cite_start]<p class="tech-stack">Tech Stack: Core Java, Java8, Postgresql, GWT, BitBucket, Bash scripts [cite: 47]</p>
-        </div>
-        
-    </div>
-</div>
-
+    <!-- JavaScript -->
+    <script src="src/js/main.js"></script>
 </body>
 </html>

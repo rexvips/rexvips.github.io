@@ -1,0 +1,50 @@
+{
+  "name": "vipul-sharma-portfolio",
+  "version": "1.0.0",
+  "description": "Professional portfolio website for Vipul Sharma - Software Engineer",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server . -p 3000 -o",
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "postcss src/css/main.css -o dist/css/main.min.css --map",
+    "build:js": "uglify-js src/js/main.js src/js/tools.js -o dist/js/bundle.min.js --source-map",
+    "dev": "live-server --port=3000",
+    "lint": "eslint src/js/*.js",
+    "format": "prettier --write \"**/*.{html,css,js}\"",
+    "validate": "html-validate *.html src/pages/*.html",
+    "serve": "python -m http.server 8000",
+    "deploy": "gh-pages -d ."
+  },
+  "keywords": [
+    "portfolio",
+    "software-engineer",
+    "vipul-sharma",
+    "developer-tools",
+    "responsive-design"
+  ],
+  "author": "Vipul Sharma <rexvips1@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "cssnano": "^6.0.1",
+    "eslint": "^8.50.0",
+    "gh-pages": "^6.0.0",
+    "html-validate": "^8.6.0",
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2",
+    "postcss": "^8.4.31",
+    "postcss-cli": "^10.1.0",
+    "prettier": "^3.0.3",
+    "uglify-js": "^3.17.4"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vipul-sharma/portfolio.git"
+  },
+  "homepage": "https://vipul-sharma.github.io/portfolio"
+}

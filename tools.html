@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Tools - Vipul Sharma</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-brackets">&lt;/&gt;</span>
+                <span class="logo-text">Vipul Sharma</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#experience" class="nav-link">Experience</a></li>
+                <li><a href="index.html#skills" class="nav-link">Skills</a></li>
+                <li><a href="tools.html" class="nav-link active">Tools</a></li>
+                <li><a href="src/pages/ai.html" class="nav-link">AI</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Tools Header Section -->
+    <section class="tools-header-section">
+        <div class="tools-header-container">
+            <div class="section-header">
+                <span class="section-line"></span>
+                <h1 class="section-title">Developer<br>Tools</h1>
+            </div>
+            <p class="tools-description">
+                A collection of useful developer tools for encoding, decoding, hashing, and token management.
+                All tools work client-side for security and privacy.
+            </p>
+        </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section class="tools-section">
+        <div class="tools-container">
+            
+            <!-- Base64 Encoder -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="base64-encoder">
+                        Base64 Encoder <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="base64-encoder">
+                        <div class="tool-interface">
+                            <div class="tool-input-section">
+                                <label for="base64-encode-input" class="tool-label">Input Text:</label>
+                                <textarea 
+                                    id="base64-encode-input" 
+                                    class="tool-textarea" 
+                                    placeholder="Enter text to encode..."
+                                    rows="6"
+                                ></textarea>
+                                <button class="tool-button" onclick="encodeBase64()">Encode</button>
+                            </div>
+                            <div class="tool-output-section">
+                                <label for="base64-encode-output" class="tool-label">Base64 Output:</label>
+                                <textarea 
+                                    id="base64-encode-output" 
+                                    class="tool-textarea" 
+                                    placeholder="Encoded result will appear here..."
+                                    rows="6"
+                                    readonly
+                                ></textarea>
+                                <button class="tool-button tool-button-secondary" onclick="copyToClipboard('base64-encode-output')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Base64 Decoder -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="base64-decoder">
+                        Base64 Decoder <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="base64-decoder">
+                        <div class="tool-interface">
+                            <div class="tool-input-section">
+                                <label for="base64-decode-input" class="tool-label">Base64 Input:</label>
+                                <textarea 
+                                    id="base64-decode-input" 
+                                    class="tool-textarea" 
+                                    placeholder="Enter Base64 encoded string to decode..."
+                                    rows="6"
+                                ></textarea>
+                                <button class="tool-button" onclick="decodeBase64()">Decode</button>
+                            </div>
+                            <div class="tool-output-section">
+                                <label for="base64-decode-output" class="tool-label">Decoded Output:</label>
+                                <textarea 
+                                    id="base64-decode-output" 
+                                    class="tool-textarea" 
+                                    placeholder="Decoded result will appear here..."
+                                    rows="6"
+                                    readonly
+                                ></textarea>
+                                <button class="tool-button tool-button-secondary" onclick="copyToClipboard('base64-decode-output')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- URL Encoder/Decoder -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="url-encoder">
+                        URL Encoder <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="url-encoder">
+                        <div class="tool-interface">
+                            <div class="tool-input-section">
+                                <label for="url-encode-input" class="tool-label">Input Text:</label>
+                                <textarea 
+                                    id="url-encode-input" 
+                                    class="tool-textarea" 
+                                    placeholder="Enter text to URL encode..."
+                                    rows="6"
+                                ></textarea>
+                                <button class="tool-button" onclick="encodeURL()">Encode</button>
+                            </div>
+                            <div class="tool-output-section">
+                                <label for="url-encode-output" class="tool-label">Encoded Output:</label>
+                                <textarea 
+                                    id="url-encode-output" 
+                                    class="tool-textarea" 
+                                    placeholder="URL encoded text will appear here..."
+                                    rows="6"
+                                    readonly
+                                ></textarea>
+                                <button class="tool-button tool-button-secondary" onclick="copyToClipboard('url-encode-output')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- URL Decoder -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="url-decoder">
+                        URL Decoder <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="url-decoder">
+                        <div class="tool-interface">
+                            <div class="tool-input-section">
+                                <label for="url-decode-input" class="tool-label">URL Encoded Text:</label>
+                                <textarea 
+                                    id="url-decode-input" 
+                                    class="tool-textarea" 
+                                    placeholder="Enter URL encoded text to decode..."
+                                    rows="6"
+                                ></textarea>
+                                <button class="tool-button" onclick="decodeURL()">Decode</button>
+                            </div>
+                            <div class="tool-output-section">
+                                <label for="url-decode-output" class="tool-label">Decoded Output:</label>
+                                <textarea 
+                                    id="url-decode-output" 
+                                    class="tool-textarea" 
+                                    placeholder="Decoded text will appear here..."
+                                    rows="6"
+                                    readonly
+                                ></textarea>
+                                <button class="tool-button tool-button-secondary" onclick="copyToClipboard('url-decode-output')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHA256 Hash Generator -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="sha256-hasher">
+                        SHA256 Hash Generator <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="sha256-hasher">
+                        <div class="tool-interface">
+                            <div class="tool-input-section">
+                                <label for="sha256-input" class="tool-label">Input Text:</label>
+                                <textarea 
+                                    id="sha256-input" 
+                                    class="tool-textarea" 
+                                    placeholder="Enter text to hash with SHA256..."
+                                    rows="6"
+                                ></textarea>
+                                <button class="tool-button" onclick="generateSHA256()">Generate Hash</button>
+                            </div>
+                            <div class="tool-output-section">
+                                <label for="sha256-output" class="tool-label">SHA256 Hash:</label>
+                                <textarea 
+                                    id="sha256-output" 
+                                    class="tool-textarea" 
+                                    placeholder="SHA256 hash will appear here..."
+                                    rows="6"
+                                    readonly
+                                ></textarea>
+                                <button class="tool-button tool-button-secondary" onclick="copyToClipboard('sha256-output')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JWT Encoder & Decoder -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="jwt-tools">
+                        JWT Encoder & Decoder <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="jwt-tools">
+                        <!-- JWT Encoder Section -->
+                        <div class="jwt-subsection">
+                            <div class="collapsible-section">
+                                <h4 class="collapsible-header jwt-sub-header" data-target="jwt-encoder">
+                                    JWT Encoder <span class="toggle-icon">+</span>
+                                </h4>
+                                <div class="collapsible-content" id="jwt-encoder">
+                                    <div class="tool-interface">
+                                        <div class="tool-input-section">
+                                            <label for="jwt-encode-header" class="tool-label">Header (JSON):</label>
+                                            <textarea 
+                                                id="jwt-encode-header" 
+                                                class="tool-textarea jwt-header-color" 
+                                                rows="3"
+                                                placeholder='{
+  "alg": "HS256",
+  "typ": "JWT"
+}'
+                                            >{"alg": "HS256", "typ": "JWT"}</textarea>
+                                            
+                                            <label for="jwt-encode-payload" class="tool-label">Payload (JSON):</label>
+                                            <textarea 
+                                                id="jwt-encode-payload" 
+                                                class="tool-textarea jwt-payload-color" 
+                                                rows="4"
+                                                placeholder='{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}'
+                                            >{"sub": "1234567890", "name": "John Doe", "iat": 1516239022}</textarea>
+                                            
+                                            <label for="jwt-encode-secret" class="tool-label">Secret Key:</label>
+                                            <input 
+                                                type="text" 
+                                                id="jwt-encode-secret" 
+                                                class="tool-input jwt-secret-field" 
+                                                placeholder="Enter secret key..."
+                                                value="your-256-bit-secret"
+                                            />
+                                            
+                                            <div class="tool-button-group">
+                                                <button class="tool-button" onclick="encodeJWTToken()">Encode JWT</button>
+                                                <button class="tool-button tool-button-secondary" onclick="clearJWTEncoder()">Clear</button>
+                                            </div>
+                                        </div>
+                                        <div class="tool-output-section">
+                                            <label for="jwt-encoded-output" class="tool-label">Encoded JWT Token:</label>
+                                            <textarea 
+                                                id="jwt-encoded-output" 
+                                                class="tool-textarea" 
+                                                placeholder="Encoded JWT token will appear here..."
+                                                rows="6"
+                                                readonly
+                                            ></textarea>
+                                            <div class="tool-button-group">
+                                                <button class="tool-button tool-button-secondary" onclick="copyToClipboard('jwt-encoded-output')">Copy Token</button>
+                                                <button class="tool-button tool-button-secondary" onclick="clearJWTEncodedOutput()">Clear Output</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- JWT Decoder Section -->
+                        <div class="jwt-subsection">
+                            <div class="collapsible-section">
+                                <h4 class="collapsible-header jwt-sub-header" data-target="jwt-decoder">
+                                    JWT Decoder <span class="toggle-icon">+</span>
+                                </h4>
+                                <div class="collapsible-content" id="jwt-decoder">
+                                    <div class="tool-interface">
+                                        <div class="tool-input-section">
+                                            <label for="jwt-decode-input" class="tool-label">JWT Token:</label>
+                                            <textarea 
+                                                id="jwt-decode-input" 
+                                                class="tool-textarea" 
+                                                placeholder="Paste your JWT token here to decode..."
+                                                rows="6"
+                                            ></textarea>
+                                            
+                                            <label for="jwt-decode-secret" class="tool-label">Secret Key (for verification):</label>
+                                            <input 
+                                                type="text" 
+                                                id="jwt-decode-secret" 
+                                                class="tool-input jwt-secret-field" 
+                                                placeholder="Enter secret key for signature verification..."
+                                            />
+                                            
+                                            <div class="tool-button-group">
+                                                <button class="tool-button" onclick="decodeJWTToken()">Decode JWT</button>
+                                                <button class="tool-button tool-button-secondary" onclick="clearJWTDecoder()">Clear</button>
+                                            </div>
+                                        </div>
+                                        <div class="tool-output-section">
+                                            <label class="tool-label">Decoded JWT:</label>
+                                            <div class="jwt-decoded-results">
+                                                <div class="jwt-decode-part">
+                                                    <h4 class="jwt-part-title">Header:</h4>
+                                                    <pre id="jwt-decoded-header-output" class="jwt-decoded-content jwt-header-color"></pre>
+                                                </div>
+                                                <div class="jwt-decode-part">
+                                                    <h4 class="jwt-part-title">Payload:</h4>
+                                                    <pre id="jwt-decoded-payload-output" class="jwt-decoded-content jwt-payload-color"></pre>
+                                                </div>
+                                                <div class="jwt-decode-part">
+                                                    <h4 class="jwt-part-title">Signature Verification:</h4>
+                                                    <div id="jwt-signature-status-output" class="jwt-signature-status jwt-signature-unknown">Enter a JWT token to verify</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Text Case Converter -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="text-case-converter">
+                        Text Case Converter <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="text-case-converter">
+                        <div class="tool-interface">
+                            <div class="tool-input-section">
+                                <label for="case-input" class="tool-label">Input Text:</label>
+                                <textarea 
+                                    id="case-input" 
+                                    class="tool-textarea" 
+                                    placeholder="Enter text to convert case..."
+                                    rows="6"
+                                ></textarea>
+                                <div class="tool-button-group case-buttons">
+                                    <button class="tool-button" onclick="convertCase('upper')">UPPERCASE</button>
+                                    <button class="tool-button" onclick="convertCase('lower')">lowercase</button>
+                                    <button class="tool-button" onclick="convertCase('title')">Title Case</button>
+                                    <button class="tool-button" onclick="convertCase('sentence')">Sentence case</button>
+                                </div>
+                                <button class="tool-button tool-button-secondary tool-clear-button" onclick="clearTextConverter()">Clear Input</button>
+                            </div>
+                            <div class="tool-output-section">
+                                <label for="case-output" class="tool-label">Converted Text:</label>
+                                <textarea 
+                                    id="case-output" 
+                                    class="tool-textarea" 
+                                    placeholder="Converted text will appear here..."
+                                    rows="6"
+                                    readonly
+                                ></textarea>
+                                <div class="tool-button-group">
+                                    <button class="tool-button tool-button-secondary" onclick="copyToClipboard('case-output')">Copy</button>
+                                    <button class="tool-button tool-button-secondary" onclick="clearCaseOutput()">Clear Output</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script src="tools.js"></script>
+</body>
+</html>
