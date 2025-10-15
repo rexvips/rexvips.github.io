@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games - Vipul Sharma</title>
+    <meta name="description" content="Games - Classic Snake game and other fun browser games.">
+    <meta name="keywords" content="Games, Snake Game, Browser Games, JavaScript Games">
+    <meta name="author" content="Vipul Sharma">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-brackets">&lt;/&gt;</span>
+                <span class="logo-text">Vipul Sharma</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html#home" class="nav-link">Home</a></li>
+                <li><a href="../../index.html#about" class="nav-link">About</a></li>
+                <li><a href="../../index.html#experience" class="nav-link">Experience</a></li>
+                <li><a href="../../index.html#skills" class="nav-link">Skills</a></li>
+                <li><a href="tools.html" class="nav-link">Tools</a></li>
+                <li><a href="ai.html" class="nav-link">AI</a></li>
+                <li><a href="games.html" class="nav-link active">Games</a></li>
+                <li><a href="../../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Games Header Section -->
+    <section class="tools-header-section">
+        <div class="tools-header-container">
+            <div class="section-header">
+                <span class="section-line"></span>
+                <h1 class="section-title">Browser Games</h1>
+            </div>
+            <p class="tools-description">
+                A collection of classic browser games built with JavaScript.
+                All games run client-side and work offline once loaded.
+            </p>
+        </div>
+    </section>
+
+    <!-- Games Section -->
+    <section class="tools-section">
+        <div class="tools-container">
+            
+            <!-- Snake Game -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="snake-game">
+                        Snake Game <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="snake-game">
+                        <div class="game-interface">
+                            <div class="game-info">
+                                <div class="game-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Score:</span>
+                                        <span id="snake-score" class="stat-value">0</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">High Score:</span>
+                                        <span id="snake-high-score" class="stat-value">0</span>
+                                    </div>
+                                </div>
+                                <div class="game-controls">
+                                    <button id="snake-start-btn" class="tool-button game-button">Start Game</button>
+                                    <button id="snake-pause-btn" class="tool-button tool-button-secondary game-button" disabled>Pause</button>
+                                    <button id="snake-reset-btn" class="tool-button tool-button-secondary game-button">Reset</button>
+                                </div>
+                            </div>
+                            
+                            <div class="game-canvas-container">
+                                <canvas id="snake-canvas" width="400" height="400"></canvas>
+                                <div id="game-over-overlay" class="game-overlay" style="display: none;">
+                                    <div class="game-over-content">
+                                        <h3>Game Over!</h3>
+                                        <p>Final Score: <span id="final-score">0</span></p>
+                                        <button onclick="resetSnakeGame()" class="tool-button">Play Again</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="game-instructions">
+                                <h4>How to Play:</h4>
+                                <ul class="instruction-list">
+                                    <li>Use arrow keys or WASD to control the snake</li>
+                                    <li>Eat the red food to grow and increase your score</li>
+                                    <li>Snake wraps around walls - avoid hitting your own tail</li>
+                                    <li>Press Space to pause/unpause during the game</li>
+                                </ul>
+                                <div class="keyboard-controls">
+                                    <div class="control-group">
+                                        <div class="control-key">↑</div>
+                                        <div class="control-key">W</div>
+                                        <span class="control-label">Up</span>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="control-key">↓</div>
+                                        <div class="control-key">S</div>
+                                        <span class="control-label">Down</span>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="control-key">←</div>
+                                        <div class="control-key">A</div>
+                                        <span class="control-label">Left</span>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="control-key">→</div>
+                                        <div class="control-key">D</div>
+                                        <span class="control-label">Right</span>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="control-key">Space</div>
+                                        <span class="control-label">Pause</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asteroids Game -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="asteroids-game">
+                        Asteroids <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="asteroids-game">
+                        <div class="game-interface">
+                            <div class="game-info">
+                                <div class="game-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Score:</span>
+                                        <span id="asteroids-score" class="stat-value">0</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Lives:</span>
+                                        <span id="asteroids-lives" class="stat-value">3</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">High Score:</span>
+                                        <span id="asteroids-high-score" class="stat-value">0</span>
+                                    </div>
+                                </div>
+                                <div class="game-controls">
+                                    <button id="asteroids-start-btn" class="tool-button game-button">Start Game</button>
+                                    <button id="asteroids-pause-btn" class="tool-button tool-button-secondary game-button" disabled>Pause</button>
+                                    <button id="asteroids-reset-btn" class="tool-button tool-button-secondary game-button">Reset</button>
+                                </div>
+                            </div>
+                            
+                            <div class="game-canvas-container">
+                                <canvas id="asteroids-canvas" width="600" height="400"></canvas>
+                                <div id="asteroids-game-over-overlay" class="game-overlay" style="display: none;">
+                                    <div class="game-over-content">
+                                        <h3>Game Over!</h3>
+                                        <p>Final Score: <span id="asteroids-final-score">0</span></p>
+                                        <button onclick="resetAsteroidsGame()" class="tool-button">Play Again</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="game-instructions">
+                                <h4>How to Play:</h4>
+                                <ul class="instruction-list">
+                                    <li>Use arrow keys or WASD to rotate and thrust your ship</li>
+                                    <li>Press Spacebar to shoot asteroids</li>
+                                    <li>Destroy all asteroids to advance to the next level</li>
+                                    <li>Avoid colliding with asteroids</li>
+                                    <li>Large asteroids break into smaller ones when shot</li>
+                                </ul>
+                                <div class="keyboard-controls">
+                                    <div class="control-group">
+                                        <div class="control-key">↑</div>
+                                        <div class="control-key">W</div>
+                                        <span class="control-label">Thrust</span>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="control-key">←</div>
+                                        <div class="control-key">A</div>
+                                        <span class="control-label">Rotate Left</span>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="control-key">→</div>
+                                        <div class="control-key">D</div>
+                                        <span class="control-label">Rotate Right</span>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="control-key">Space</div>
+                                        <span class="control-label">Shoot</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2048 Game -->
+            <div class="tool-item" style="display: none;">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="game-2048">
+                        2048 <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="game-2048">
+                        <div class="game-interface">
+                            <div class="game-info">
+                                <div class="game-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Score:</span>
+                                        <span id="game2048-score" class="stat-value">0</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Best:</span>
+                                        <span id="game2048-best" class="stat-value">0</span>
+                                    </div>
+                                </div>
+                                <div class="game-controls">
+                                    <div class="grid-size-selector">
+                                        <label for="grid-size-select" class="control-label">Grid Size:</label>
+                                        <select id="grid-size-select" class="grid-size-select">
+                                            <option value="4">4x4</option>
+                                            <option value="5">5x5</option>
+                                            <option value="6">6x6</option>
+                                        </select>
+                                    </div>
+                                    <button id="game2048-new-btn" class="tool-button game-button">New Game</button>
+                                    <button id="game2048-undo-btn" class="tool-button tool-button-secondary game-button">Undo</button>
+                                </div>
+                            </div>
+                            
+                            <div class="game2048-container">
+                                <div id="game2048-grid" class="game2048-grid">
+                                    <!-- Grid will be generated by JavaScript -->
+                                </div>
+                                <div id="game2048-win-overlay" class="game-overlay" style="display: none;">
+                                    <div class="game-over-content">
+                                        <h3>You Win!</h3>
+                                        <p>You reached 2048!</p>
+                                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                                            <button onclick="continueGame2048()" class="tool-button">Continue</button>
+                                            <button onclick="newGame2048()" class="tool-button tool-button-secondary">New Game</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="game2048-lose-overlay" class="game-overlay" style="display: none;">
+                                    <div class="game-over-content">
+                                        <h3>Game Over!</h3>
+                                        <p>No more moves available</p>
+                                        <button onclick="newGame2048()" class="tool-button">Try Again</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="game-instructions">
+                                <h4>How to Play:</h4>
+                                <ul class="instruction-list">
+                                    <li>Use arrow keys or WASD to move tiles</li>
+                                    <li>When two tiles with the same number touch, they merge into one</li>
+                                    <li>Get to the 2048 tile to win!</li>
+                                    <li>Don't worry, you can continue playing to get a higher score</li>
+                                </ul>
+                                <div class="keyboard-controls">
+                                    <div class="control-group">
+                                        <div class="control-key">↑</div>
+                                        <div class="control-key">W</div>
+                                        <span class="control-label">Up</span>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="control-key">↓</div>
+                                        <div class="control-key">S</div>
+                                        <span class="control-label">Down</span>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="control-key">←</div>
+                                        <div class="control-key">A</div>
+                                        <span class="control-label">Left</span>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="control-key">→</div>
+                                        <div class="control-key">D</div>
+                                        <span class="control-label">Right</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script src="../js/main.js"></script>
+    <script src="../js/games.js"></script>
+</body>
+</html>
