@@ -203,7 +203,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Vipul Sharma**
 - Email: rexvips1@gmail.com
 - LinkedIn: [ivipulsharma](https://www.linkedin.com/in/ivipulsharma)
-- Current Role: Software Development Engineer II at Kotak Mahindra Bank
+- Current Role: Senior Software Engineer at CGI, Canada
+- Status: Permanent Resident of Canada
 
 ## 🙏 Acknowledgments
 

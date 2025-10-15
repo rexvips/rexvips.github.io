@@ -540,3 +540,163 @@
         max-width: 300px;
     }
 }
+
+/* ===== GEOGRAPHIC EXPERIENCE DISTINCTION ===== */
+
+/* Experience Section Headers */
+.experience-section-header {
+    margin: 3rem 0 2rem 0;
+    text-align: center;
+}
+
+.country-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+}
+
+.country-indicator.canada {
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(255, 255, 255, 0.05));
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    color: #ff6b6b;
+}
+
+.country-indicator.india {
+    background: linear-gradient(135deg, rgba(255, 153, 51, 0.1), rgba(0, 128, 0, 0.05));
+    border: 2px solid rgba(255, 153, 51, 0.3);
+    color: #ff9933;
+}
+
+.flag-icon {
+    font-size: 1.2rem;
+}
+
+.country-label {
+    font-size: 0.85rem;
+}
+
+/* Experience Items by Country */
+.experience-item.canada-experience {
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.03), rgba(255, 255, 255, 0.01));
+    border-left: 4px solid #ff6b6b;
+    position: relative;
+    overflow: hidden;
+}
+
+.experience-item.canada-experience::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ff6b6b, transparent);
+}
+
+.experience-item.india-experience {
+    background: linear-gradient(135deg, rgba(255, 153, 51, 0.03), rgba(0, 128, 0, 0.01));
+    border-left: 4px solid #ff9933;
+    position: relative;
+    overflow: hidden;
+}
+
+.experience-item.india-experience::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ff9933, #28a745, transparent);
+}
+
+/* Location Badges */
+.experience-location-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.canada-badge {
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 0, 0, 0.2);
+}
+
+.india-badge {
+    background: rgba(255, 153, 51, 0.1);
+    color: #ff9933;
+    border: 1px solid rgba(255, 153, 51, 0.2);
+}
+
+/* Enhanced Timeline Visual */
+.experience-timeline {
+    position: relative;
+}
+
+.experience-timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+        to bottom,
+        #ff6b6b 0%,
+        #ff6b6b 20%,
+        #007bff 20%,
+        #007bff 40%,
+        #ff9933 40%,
+        #ff9933 100%
+    );
+    z-index: 1;
+}
+
+/* Experience Date Styling by Country */
+.canada-experience .experience-date {
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(255, 255, 255, 0.05));
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 0, 0, 0.2);
+}
+
+.india-experience .experience-date {
+    background: linear-gradient(135deg, rgba(255, 153, 51, 0.1), rgba(0, 128, 0, 0.05));
+    color: #ff9933;
+    border: 1px solid rgba(255, 153, 51, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .country-indicator {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.8rem;
+        gap: 0.5rem;
+    }
+    
+    .flag-icon {
+        font-size: 1rem;
+    }
+    
+    .experience-location-badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .experience-timeline::before {
+        left: 15px;
+    }
+}
