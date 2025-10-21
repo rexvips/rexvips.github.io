@@ -644,7 +644,7 @@ body {
 }
 
 .collapsible-content.active {
-    max-height: 500px;
+    max-height: 2000px;
     padding: 1rem 0;
 }
 
@@ -3426,3 +3426,742 @@ body {
     }
 }
 
+/* ===================================
+   BOX BREATHING MEDITATION - EXACT UI MATCH
+   =================================== */
+
+/* Meditation App Container - Full screen gradient like the image */
+.meditation-app-container {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hide the meditation container initially */
+#box-meditation .meditation-app-container {
+    margin: -1rem;
+    border-radius: 0;
+}
+
+/* Settings Panel - Clean and Simple */
+.meditation-settings-panel {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+}
+
+.setting-item label {
+    font-weight: 600;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.setting-item select {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    backdrop-filter: blur(5px);
+}
+
+.setting-item select option {
+    background: #4a5568;
+    color: white;
+}
+
+.start-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    width: 100%;
+}
+
+.start-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Main Meditation Interface - Exact match to image */
+.meditation-interface {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 100vh;
+    padding: 2rem;
+    width: 100%;
+}
+
+/* Progress Ring Container */
+.progress-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-ring-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+}
+
+.progress-ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 3;
+}
+
+.progress-ring-fill {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.6);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 817;
+    stroke-dashoffset: 817;
+    transition: stroke-dashoffset 1s ease;
+}
+
+/* Breathing Circle - Exact center positioning like image */
+.breathing-circle-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.breathing-circle {
+    width: 180px;
+    height: 180px;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 70%, transparent 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.breathing-dot {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Breathing States */
+.breathing-circle.inhale {
+    transform: scale(1.3);
+    border-color: rgba(255, 255, 255, 0.7);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 70%, transparent 100%);
+}
+
+.breathing-circle.exhale {
+    transform: scale(0.7);
+    border-color: rgba(255, 255, 255, 0.3);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 70%, transparent 100%);
+}
+
+.breathing-circle.hold {
+    animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gentle-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Typography - Exact match to image */
+.meditation-title {
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: white;
+    margin: 0 0 1rem 0;
+    letter-spacing: 1px;
+}
+
+.cycle-info {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 3rem;
+    font-weight: 400;
+}
+
+.timer-display {
+    margin-bottom: 1.5rem;
+}
+
+.timer-number {
+    font-size: 6rem;
+    font-weight: 100;
+    color: white;
+    line-height: 1;
+    display: block;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.phase-text {
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 3rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+/* Complete Button - Exact match to image */
+.complete-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 1rem 3rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.5px;
+    margin-top: 1rem;
+}
+
+.complete-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Hidden Controls */
+.hidden-controls {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1rem;
+    opacity: 0.7;
+}
+
+.control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .meditation-settings-panel {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .progress-container {
+        width: 240px;
+        height: 240px;
+    }
+    
+    .breathing-circle {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .meditation-title {
+        font-size: 2rem;
+    }
+    
+    .timer-number {
+        font-size: 4.5rem;
+    }
+    
+    .phase-text {
+        font-size: 1.2rem;
+    }
+    
+    .meditation-interface {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .progress-container {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .breathing-circle {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .meditation-title {
+        font-size: 1.8rem;
+    }
+    
+    .timer-number {
+        font-size: 3.5rem;
+    }
+    
+    .complete-btn {
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+    }
+}
+    
+    .meditation-grid {
+        padding: 1rem;
+    }
+    
+    .meditation-btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* ============================================
+   NEW MEDITATION UI - EXACT MATCH TO IMAGES
+   ============================================ */
+
+/* Main Meditation Section */
+.meditation-main-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 1rem;
+}
+
+/* Selection Screen */
+.meditation-selection-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.meditation-selection-container {
+    width: 100%;
+    text-align: center;
+}
+
+.meditation-main-title {
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: white;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+/* Meditation Options */
+.meditation-option {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.meditation-option:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.meditation-option-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #007bff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-weight: 600;
+    color: white;
+    font-size: 1rem;
+}
+
+.meditation-option-icon.breathing-478 {
+    background: #28a745;
+}
+
+.meditation-option-content {
+    margin-bottom: 1.5rem;
+}
+
+.meditation-option-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.meditation-option-description {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.meditation-start-button {
+    width: 100%;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.box-breathing-btn {
+    background: #007bff;
+}
+
+.box-breathing-btn:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+.breathing-478-btn {
+    background: #28a745;
+}
+
+.breathing-478-btn:hover {
+    background: #1e7e34;
+    transform: translateY(-1px);
+}
+
+/* Session Screens */
+.meditation-session-screen {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.meditation-session-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Progress Ring Container */
+.meditation-progress-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin-bottom: 2rem;
+}
+
+.meditation-progress-ring {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.progress-ring-background {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 3;
+}
+
+.progress-ring-progress {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.8);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease;
+}
+
+/* Meditation Icon */
+.meditation-icon-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.meditation-icon {
+    font-size: 4rem;
+    animation: breathe 4s infinite ease-in-out;
+}
+
+/* Session Info */
+.session-title {
+    font-size: 2rem;
+    font-weight: 300;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.session-info {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.cycle-counter {
+    margin-right: 0.5rem;
+}
+
+/* Breath Counter */
+.breath-counter {
+    font-size: 6rem;
+    font-weight: 200;
+    color: white;
+    margin-bottom: 1rem;
+    line-height: 1;
+}
+
+/* Phase Instruction */
+.phase-instruction {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 3rem;
+    font-weight: 300;
+}
+
+/* Complete Session Button */
+.complete-session-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.complete-session-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Haptic Feedback Text */
+.haptic-text {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    font-weight: 300;
+}
+
+/* Completion Overlay */
+.completion-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.completion-content {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 400px;
+    width: 90%;
+}
+
+.completion-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #28a745;
+    color: white;
+    font-size: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.completion-content h3 {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.completion-content p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Animations */
+@keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(255, 255, 255, 0.6); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .meditation-main-title {
+        font-size: 2rem;
+    }
+    
+    .meditation-option {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .meditation-progress-container {
+        width: 240px;
+        height: 240px;
+    }
+    
+    .meditation-icon-container {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .meditation-icon {
+        font-size: 3rem;
+    }
+    
+    .session-title {
+        font-size: 1.5rem;
+    }
+    
+    .breath-counter {
+        font-size: 4.5rem;
+    }
+    
+    .phase-instruction {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .meditation-main-section {
+        padding: 1rem 0.5rem;
+    }
+    
+    .meditation-progress-container {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .meditation-icon-container {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .meditation-icon {
+        font-size: 2.5rem;
+    }
+    
+    .breath-counter {
+        font-size: 3.5rem;
+    }
+    
+    .completion-content {
+        padding: 2rem 1.5rem;
+    }
+}

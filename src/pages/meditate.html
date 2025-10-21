@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditate - Vipul Sharma</title>
+    <meta name="description" content="Meditation - Box breathing, 4-7-8 breathing, and other mindfulness practices.">
+    <meta name="keywords" content="Meditation, Breathing Exercises, Mindfulness, Box Breathing, 4-7-8 Breathing">
+    <meta name="author" content="Vipul Sharma">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-brackets">&lt;/&gt;</span>
+                <span class="logo-text">Vipul Sharma</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html#home" class="nav-link">Home</a></li>
+                <li><a href="../../index.html#about" class="nav-link">About</a></li>
+                <li><a href="../../index.html#experience" class="nav-link">Experience</a></li>
+                <li><a href="../../index.html#skills" class="nav-link">Skills</a></li>
+                <li><a href="tools.html" class="nav-link">Tools</a></li>
+                <li><a href="ai.html" class="nav-link">AI</a></li>
+                <li><a href="games.html" class="nav-link">Games</a></li>
+                <li><a href="meditate.html" class="nav-link active">Meditate</a></li>
+                <li><a href="../../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Meditation Header Section -->
+    <section class="tools-header-section">
+        <div class="tools-header-container">
+            <div class="section-header">
+                <span class="section-line"></span>
+                <h1 class="section-title">Mindful Meditation</h1>
+            </div>
+            <p class="tools-description">
+                Practice mindfulness and breathing exercises to reduce stress and improve focus.
+                All meditation sessions run locally and work offline once loaded.
+            </p>
+        </div>
+    </section>
+
+    <!-- Meditation Main Interface -->
+    <section class="meditation-main-section">
+        <!-- Meditation Selection Screen -->
+        <div class="meditation-selection-screen" id="meditation-selection">
+            <div class="meditation-selection-container">
+                <!-- Box Breathing Option -->
+                <div class="meditation-option" data-type="box">
+                    <div class="meditation-option-icon">
+                        <span class="option-number">4-4</span>
+                    </div>
+                    <div class="meditation-option-content">
+                        <h3 class="meditation-option-title">Box Breathing</h3>
+                        <p class="meditation-option-description">4-4-4-4 pattern for focus</p>
+                    </div>
+                    <button class="meditation-start-button box-breathing-btn" id="start-box-breathing">
+                        Start Box Breathing
+                    </button>
+                </div>
+                
+                <!-- 4-7-8 Breathing Option -->
+                <div class="meditation-option" data-type="478">
+                    <div class="meditation-option-icon breathing-478">
+                        <span class="option-number">4-7-8</span>
+                    </div>
+                    <div class="meditation-option-content">
+                        <h3 class="meditation-option-title">4-7-8 Breathing</h3>
+                        <p class="meditation-option-description">Relaxation technique</p>
+                    </div>
+                    <button class="meditation-start-button breathing-478-btn" id="start-478-breathing">
+                        Start 4-7-8 Breathing
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Box Breathing Session -->
+        <div class="meditation-session-screen" id="box-breathing-session" style="display: none;">
+            <div class="meditation-session-container">
+                <!-- Progress Ring -->
+                <div class="meditation-progress-container">
+                    <svg class="meditation-progress-ring" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" class="progress-ring-background"/>
+                        <circle cx="100" cy="100" r="90" class="progress-ring-progress" id="box-progress-ring"/>
+                    </svg>
+                    
+                    <!-- Meditation Icon -->
+                    <div class="meditation-icon-container">
+                        <div class="meditation-icon">🧘‍♀️</div>
+                    </div>
+                </div>
+
+                <!-- Session Info -->
+                <h2 class="session-title">Box Breathing</h2>
+                <div class="session-info">
+                    <span class="cycle-counter" id="box-cycle">Cycle 1</span>
+                    <span class="time-remaining" id="box-time-remaining">• 4:57 remaining</span>
+                </div>
+
+                <!-- Large Counter -->
+                <div class="breath-counter" id="box-counter">1</div>
+
+                <!-- Phase Text -->
+                <div class="phase-instruction" id="box-phase">Breathe in slowly...</div>
+
+                <!-- Complete Button -->
+                <button class="complete-session-btn" id="box-complete">Complete Session</button>
+                
+                <!-- Haptic Feedback Text -->
+                <div class="haptic-text">Tap for haptic feedback</div>
+            </div>
+        </div>
+
+        <!-- 4-7-8 Breathing Session -->
+        <div class="meditation-session-screen" id="breathing-478-session" style="display: none;">
+            <div class="meditation-session-container">
+                <!-- Progress Ring -->
+                <div class="meditation-progress-container">
+                    <svg class="meditation-progress-ring" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" class="progress-ring-background"/>
+                        <circle cx="100" cy="100" r="90" class="progress-ring-progress" id="breathing-478-progress-ring"/>
+                    </svg>
+                    
+                    <!-- Meditation Icon -->
+                    <div class="meditation-icon-container">
+                        <div class="meditation-icon">🧘‍♀️</div>
+                    </div>
+                </div>
+
+                <!-- Session Info -->
+                <h2 class="session-title">4-7-8 Breathing</h2>
+                <div class="session-info">
+                    <span class="cycle-counter" id="breathing-478-cycle">Cycle 1</span>
+                    <span class="time-remaining" id="breathing-478-time-remaining">• 4:59 remaining</span>
+                </div>
+
+                <!-- Large Counter -->
+                <div class="breath-counter" id="breathing-478-counter">3</div>
+
+                <!-- Phase Text -->
+                <div class="phase-instruction" id="breathing-478-phase">Breathe in through nose...</div>
+
+                <!-- Complete Button -->
+                <button class="complete-session-btn" id="breathing-478-complete">Complete Session</button>
+                
+                <!-- Haptic Feedback Text -->
+                <div class="haptic-text">Tap for haptic feedback</div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- JavaScript -->
+    <script src="../js/main.js"></script>
+    <script src="../js/meditation.js"></script>
+</body>
+</html>

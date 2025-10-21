@@ -4,6 +4,15 @@ document.addEventListener('DOMContentLoaded', function() {
     initSnakeGame();
     initAsteroidsGame();
     init2048Game();
+    initBoxBreathingMeditation();
+    init478Meditation();
+    
+    // Ensure collapsible sections work properly
+    setTimeout(() => {
+        console.log('Box breathing meditation elements check:');
+        console.log('Start button:', document.getElementById('box-start-btn'));
+        console.log('Meditation section:', document.getElementById('box-meditation'));
+    }, 100);
 });
 
 // Navigation functionality
@@ -15,6 +24,7 @@ function initNavigation() {
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
         if ((currentPage === 'games.html' && href === 'games.html') ||
+            (currentPage === 'meditate.html' && href === 'meditate.html') ||
             (currentPage === 'index.html' && href === 'index.html') ||
             (currentPage === '' && href === 'index.html')) {
             link.classList.add('active');
@@ -1051,4 +1061,279 @@ function undoMove2048() {
 
 function continueGame2048() {
     document.getElementById('game2048-win-overlay').style.display = 'none';
+}
+
+// ============================================
+// BOX BREATHING MEDITATION IMPLEMENTATION
+// ============================================
+
+// ============================================
+// BOX BREATHING MEDITATION - EXACT UI MATCH
+// ============================================
+
+class SimpleMeditationApp {
+    constructor() {
+        this.config = {
+            breathDuration: 4,
+            sessionDuration: 10,
+            phases: ['Inhale', 'Hold', 'Exhale', 'Hold Empty']
+        };
+
+        this.state = {
+            isRunning: false,
+            currentPhase: 0,
+            phaseTimeRemaining: 0,
+            sessionStartTime: null,
+            sessionTimeElapsed: 0,
+            cyclesCompleted: 1,
+            timers: { phase: null, session: null }
+        };
+
+        this.elements = {};
+        this.init();
+    }
+
+    init() {
+        this.bindElements();
+        this.bindEvents();
+        console.log('Simple Meditation App initialized');
+    }
+
+    bindElements() {
+        // Settings
+        this.elements.breathDurationSelect = document.getElementById('breath-duration');
+        this.elements.sessionDurationSelect = document.getElementById('session-duration');
+        this.elements.startBtn = document.getElementById('start-meditation');
+        
+        // Settings panel and interface
+        this.elements.settingsPanel = document.getElementById('meditation-settings');
+        this.elements.meditationInterface = document.getElementById('meditation-interface');
+        
+        // Main interface elements
+        this.elements.breathingCircle = document.getElementById('breathing-circle');
+        this.elements.sessionProgress = document.getElementById('session-progress');
+        this.elements.timerNumber = document.getElementById('timer-number');
+        this.elements.phaseText = document.getElementById('phase-text');
+        this.elements.cycleDisplay = document.getElementById('cycle-display');
+        this.elements.timeRemaining = document.getElementById('time-remaining');
+        this.elements.completeBtn = document.getElementById('complete-btn');
+        this.elements.pauseBtn = document.getElementById('pause-btn');
+        this.elements.stopBtn = document.getElementById('stop-btn');
+    }
+
+    bindEvents() {
+        if (this.elements.breathDurationSelect) {
+            this.elements.breathDurationSelect.addEventListener('change', (e) => {
+                this.config.breathDuration = parseInt(e.target.value);
+            });
+        }
+
+        if (this.elements.sessionDurationSelect) {
+            this.elements.sessionDurationSelect.addEventListener('change', (e) => {
+                this.config.sessionDuration = parseInt(e.target.value);
+            });
+        }
+
+        if (this.elements.startBtn) {
+            this.elements.startBtn.addEventListener('click', () => this.startSession());
+        }
+
+        if (this.elements.completeBtn) {
+            this.elements.completeBtn.addEventListener('click', () => this.completeSession());
+        }
+
+        if (this.elements.pauseBtn) {
+            this.elements.pauseBtn.addEventListener('click', () => this.togglePause());
+        }
+
+        if (this.elements.stopBtn) {
+            this.elements.stopBtn.addEventListener('click', () => this.stopSession());
+        }
+    }
+
+    startSession() {
+        // Hide settings, show meditation interface
+        if (this.elements.settingsPanel) {
+            this.elements.settingsPanel.style.display = 'none';
+        }
+        if (this.elements.meditationInterface) {
+            this.elements.meditationInterface.style.display = 'flex';
+        }
+
+        // Initialize session state
+        this.state.isRunning = true;
+        this.state.sessionStartTime = Date.now();
+        this.state.sessionTimeElapsed = 0;
+        this.state.cyclesCompleted = 1;
+        this.state.currentPhase = 0;
+
+        this.startPhase();
+        this.startSessionTimer();
+    }
+
+    startPhase() {
+        if (!this.state.isRunning) return;
+
+        const phaseName = this.config.phases[this.state.currentPhase];
+        this.state.phaseTimeRemaining = this.config.breathDuration;
+
+        // Update UI
+        if (this.elements.phaseText) {
+            this.elements.phaseText.textContent = phaseName === 'Hold Empty' ? 'Hold your breath...' : phaseName + '...';
+        }
+        if (this.elements.timerNumber) {
+            this.elements.timerNumber.textContent = this.state.phaseTimeRemaining;
+        }
+
+        // Update breathing circle animation
+        this.updateBreathingAnimation(phaseName);
+
+        // Start phase countdown
+        this.state.timers.phase = setInterval(() => {
+            this.state.phaseTimeRemaining--;
+            if (this.elements.timerNumber) {
+                this.elements.timerNumber.textContent = this.state.phaseTimeRemaining;
+            }
+
+            if (this.state.phaseTimeRemaining <= 0) {
+                clearInterval(this.state.timers.phase);
+                this.nextPhase();
+            }
+        }, 1000);
+    }
+
+    updateBreathingAnimation(phaseName) {
+        if (!this.elements.breathingCircle) return;
+
+        // Remove all classes
+        this.elements.breathingCircle.className = 'breathing-circle';
+
+        // Add appropriate class after a small delay
+        setTimeout(() => {
+            switch(phaseName.toLowerCase()) {
+                case 'inhale':
+                    this.elements.breathingCircle.classList.add('inhale');
+                    break;
+                case 'exhale':
+                    this.elements.breathingCircle.classList.add('exhale');
+                    break;
+                case 'hold':
+                case 'hold empty':
+                    this.elements.breathingCircle.classList.add('hold');
+                    break;
+            }
+        }, 100);
+    }
+
+    nextPhase() {
+        this.state.currentPhase = (this.state.currentPhase + 1) % 4;
+
+        // Complete cycle when returning to inhale
+        if (this.state.currentPhase === 0) {
+            this.state.cyclesCompleted++;
+            if (this.elements.cycleDisplay) {
+                this.elements.cycleDisplay.textContent = `Cycle ${this.state.cyclesCompleted}`;
+            }
+        }
+
+        this.startPhase();
+    }
+
+    startSessionTimer() {
+        this.state.timers.session = setInterval(() => {
+            this.state.sessionTimeElapsed++;
+            this.updateSessionDisplay();
+
+            // Check if session is complete
+            const totalSessionTime = this.config.sessionDuration * 60;
+            if (this.state.sessionTimeElapsed >= totalSessionTime) {
+                this.completeSession();
+            }
+        }, 1000);
+    }
+
+    updateSessionDisplay() {
+        if (this.elements.timeRemaining) {
+            const totalSessionTime = this.config.sessionDuration * 60;
+            const remaining = Math.max(0, totalSessionTime - this.state.sessionTimeElapsed);
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+            this.elements.timeRemaining.textContent = `${minutes}:${seconds.toString().padStart(2, '0')} remaining`;
+        }
+
+        // Update session progress ring
+        if (this.elements.sessionProgress) {
+            const totalSessionTime = this.config.sessionDuration * 60;
+            const progress = Math.min(1, this.state.sessionTimeElapsed / totalSessionTime);
+            const circumference = 2 * Math.PI * 130;
+            const offset = circumference - (progress * circumference);
+            this.elements.sessionProgress.style.strokeDashoffset = offset;
+        }
+    }
+
+    togglePause() {
+        // Simple implementation - just stop/start
+        if (this.state.isRunning) {
+            this.stopSession();
+        }
+    }
+
+    completeSession() {
+        this.stopSession();
+        
+        // Show completion notification
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Meditation Complete! 🧘‍♀️', {
+                body: `Great job! You completed your ${this.config.sessionDuration}-minute session.`,
+                icon: '/favicon.ico'
+            });
+        }
+    }
+
+    stopSession() {
+        this.state.isRunning = false;
+
+        // Clear timers
+        Object.values(this.state.timers).forEach(timer => {
+            if (timer) clearInterval(timer);
+        });
+        this.state.timers = { phase: null, session: null };
+
+        // Reset UI
+        if (this.elements.settingsPanel) {
+            this.elements.settingsPanel.style.display = 'block';
+        }
+        if (this.elements.meditationInterface) {
+            this.elements.meditationInterface.style.display = 'none';
+        }
+
+        // Reset breathing circle
+        if (this.elements.breathingCircle) {
+            this.elements.breathingCircle.className = 'breathing-circle';
+        }
+    }
+}
+
+// Initialize
+let meditationApp = null;
+
+function initBoxBreathingMeditation() {
+    const meditationSection = document.getElementById('box-meditation');
+    if (meditationSection) {
+        console.log('Initializing Simple Meditation App...');
+        
+        setTimeout(() => {
+            try {
+                meditationApp = new SimpleMeditationApp();
+                console.log('Simple Meditation App initialized successfully');
+        } catch (error) {
+            console.error('Failed to initialize meditation app:', error);
+        }
+    }, 500);
+}
+}
+
+// Placeholder for 4-7-8 Meditation (keeping existing functionality)
+function init478Meditation() {
+    console.log('4-7-8 Meditation initialization skipped - functionality preserved from original');
 }

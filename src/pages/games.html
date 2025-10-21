@@ -27,6 +27,7 @@
                 <li><a href="tools.html" class="nav-link">Tools</a></li>
                 <li><a href="ai.html" class="nav-link">AI</a></li>
                 <li><a href="games.html" class="nav-link active">Games</a></li>
+                <li><a href="meditate.html" class="nav-link">Meditate</a></li>
                 <li><a href="../../index.html#contact" class="nav-link">Contact</a></li>
             </ul>
             <div class="nav-toggle">
@@ -203,6 +204,175 @@
                                         <span class="control-label">Shoot</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Box Breathing Meditation -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="box-meditation">
+                        Box Breathing Meditation <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="box-meditation">
+                        <!-- Meditation App Container -->
+                        <div class="meditation-app-container">
+                            <!-- Settings Panel (Hidden during session) -->
+                            <div class="meditation-settings-panel" id="meditation-settings">
+                                <div class="settings-grid">
+                                    <div class="setting-item">
+                                        <label for="breath-duration">Breath Duration:</label>
+                                        <select id="breath-duration">
+                                            <option value="3">3 seconds</option>
+                                            <option value="4" selected>4 seconds</option>
+                                            <option value="5">5 seconds</option>
+                                            <option value="6">6 seconds</option>
+                                            <option value="7">7 seconds</option>
+                                            <option value="8">8 seconds</option>
+                                        </select>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label for="session-duration">Session Duration:</label>
+                                        <select id="session-duration">
+                                            <option value="1">1 minute</option>
+                                            <option value="2">2 minutes</option>
+                                            <option value="5">5 minutes</option>
+                                            <option value="10" selected>10 minutes</option>
+                                            <option value="15">15 minutes</option>
+                                            <option value="20">20 minutes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button id="start-meditation" class="start-btn">Start Session</button>
+                            </div>
+
+                            <!-- Main Meditation Interface -->
+                            <div class="meditation-interface" id="meditation-interface" style="display: none;">
+                                <!-- Progress Ring Container -->
+                                <div class="progress-container">
+                                    <!-- Outer Progress Ring -->
+                                    <div class="progress-ring-wrapper">
+                                        <svg class="progress-ring" width="280" height="280">
+                                            <circle cx="140" cy="140" r="130" class="progress-ring-bg"></circle>
+                                            <circle cx="140" cy="140" r="130" class="progress-ring-fill" id="session-progress"></circle>
+                                        </svg>
+                                    </div>
+                                    
+                                    <!-- Inner Breathing Circle -->
+                                    <div class="breathing-circle-container">
+                                        <div class="breathing-circle" id="breathing-circle">
+                                            <div class="breathing-dot"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Title -->
+                                <h2 class="meditation-title">Box Breathing</h2>
+                                
+                                <!-- Cycle Info -->
+                                <div class="cycle-info">
+                                    <span id="cycle-display">Cycle 1</span> • <span id="time-remaining">4:56 remaining</span>
+                                </div>
+
+                                <!-- Large Timer -->
+                                <div class="timer-display">
+                                    <span class="timer-number" id="timer-number">4</span>
+                                </div>
+
+                                <!-- Phase Text -->
+                                <div class="phase-text" id="phase-text">Hold your breath...</div>
+
+                                <!-- Complete Button -->
+                                <button class="complete-btn" id="complete-btn">Complete Session</button>
+
+                                <!-- Hidden Controls -->
+                                <div class="hidden-controls">
+                                    <button id="pause-btn" class="control-btn">Pause</button>
+                                    <button id="stop-btn" class="control-btn">Stop</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4-7-8 Breathing Meditation -->
+            <div class="tool-item">
+                <div class="collapsible-section">
+                    <h3 class="collapsible-header tool-header" data-target="meditation-478">
+                        4-7-8 Breathing Meditation <span class="toggle-icon">+</span>
+                    </h3>
+                    <div class="collapsible-content" id="meditation-478">
+                        <div class="game-interface">
+                            <div class="meditation-info">
+                                <div class="meditation-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Session:</span>
+                                        <span id="meditation-478-session-time" class="stat-value">0:00</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Cycles:</span>
+                                        <span id="meditation-478-cycles" class="stat-value">0</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Phase:</span>
+                                        <span id="meditation-478-phase" class="stat-value">Ready</span>
+                                    </div>
+                                </div>
+                                <div class="meditation-controls">
+                                    <div class="meditation-preset">
+                                        <span class="control-label">Pattern: 4 sec inhale, 7 sec hold, 8 sec exhale</span>
+                                    </div>
+                                    <button id="meditation-478-start-btn" class="tool-button game-button">Start Session</button>
+                                    <button id="meditation-478-pause-btn" class="tool-button tool-button-secondary game-button" disabled>Pause</button>
+                                    <button id="meditation-478-stop-btn" class="tool-button tool-button-secondary game-button" disabled>Stop</button>
+                                </div>
+                            </div>
+                            
+                            <div class="meditation-square-container">
+                                <div class="meditation-grid">
+                                    <div class="breathing-visualization">
+                                        <div class="outer-breath-circle" id="meditation-478-outer-circle">
+                                            <div class="inner-breath-circle" id="meditation-478-inner-circle">
+                                                <div class="breath-indicator" id="meditation-478-breath-indicator">
+                                                    <div class="breath-text" id="meditation-478-breath-text">BREATHE IN</div>
+                                                    <div class="breath-count" id="meditation-478-breath-count">4</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="meditation-embedded-controls">
+                                        <div class="meditation-phase-display">
+                                            <div class="phase-indicator" id="meditation-478-phase-indicator">Ready to Begin</div>
+                                            <div class="cycle-display">Cycle: <span id="meditation-478-cycle-display">0</span></div>
+                                        </div>
+                                        
+                                        <div class="breathing-instructions-embedded" id="meditation-478-instructions-embedded">
+                                            <p>Click Start to begin your 4-7-8 relaxation session</p>
+                                        </div>
+                                        
+                                        <div class="embedded-button-group">
+                                            <button id="meditation-478-start-embedded" class="meditation-btn primary">Start</button>
+                                            <button id="meditation-478-pause-embedded" class="meditation-btn secondary" disabled>Pause</button>
+                                            <button id="meditation-478-stop-embedded" class="meditation-btn secondary" disabled>Stop</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="game-instructions">
+                                <h4>4-7-8 Breathing Technique:</h4>
+                                <ul class="instruction-list">
+                                    <li>Inhale for 4 seconds while the circle expands</li>
+                                    <li>Hold your breath for 7 seconds while the circle pulses</li>
+                                    <li>Exhale for 8 seconds while the circle contracts slowly</li>
+                                    <li>This technique helps reduce anxiety and promote relaxation</li>
+                                    <li>Practice regularly for better sleep and stress relief</li>
+                                    <li>Focus on the rhythm and let the visual guide you</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
