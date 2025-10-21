@@ -21,11 +21,54 @@ const meditationState = {
     phaseDurations: {
         box: [4, 4, 4, 4],
         '478': [4, 7, 8]
-    }
+    },
+    audioContext: null,
+    beepEnabled: true
 };
+
+// Audio functionality for meditation beeps
+function initAudioContext() {
+    if (!meditationState.audioContext) {
+        try {
+            meditationState.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (error) {
+            console.log('Audio context not supported, beeps will be disabled');
+            meditationState.beepEnabled = false;
+        }
+    }
+}
+
+function playBeep(frequency = 800, duration = 200, volume = 0.1) {
+    if (!meditationState.beepEnabled || !meditationState.audioContext) {
+        return;
+    }
+    
+    try {
+        const oscillator = meditationState.audioContext.createOscillator();
+        const gainNode = meditationState.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(meditationState.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(frequency, meditationState.audioContext.currentTime);
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0, meditationState.audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume, meditationState.audioContext.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, meditationState.audioContext.currentTime + duration / 1000);
+        
+        oscillator.start(meditationState.audioContext.currentTime);
+        oscillator.stop(meditationState.audioContext.currentTime + duration / 1000);
+    } catch (error) {
+        console.log('Beep playback failed:', error);
+    }
+}
 
 function initMeditationApp() {
     console.log('Initializing Meditation App...');
+    
+    // Initialize audio context for beeps
+    initAudioContext();
     
     // Bind event listeners
     bindMeditationEvents();
@@ -87,6 +130,11 @@ function initProgressRings() {
 function startMeditationSession(type) {
     console.log(`Starting ${type} meditation session`);
     
+    // Resume audio context if needed (required for user interaction)
+    if (meditationState.audioContext && meditationState.audioContext.state === 'suspended') {
+        meditationState.audioContext.resume();
+    }
+    
     meditationState.currentSession = type;
     meditationState.isRunning = true;
     meditationState.sessionStartTime = Date.now();
@@ -131,6 +179,17 @@ function startPhaseTimer(type) {
     
     meditationState.phaseTimeRemaining = durations[meditationState.currentPhase];
     
+    // Play initial beep to signal session start (helpful for eyes-closed meditation)
+    if (type === 'box') {
+        setTimeout(() => {
+            playBeep(1000, 200, 0.1); // Slightly higher pitched beep for session start
+        }, 500); // Small delay to ensure audio context is ready
+    } else if (type === '478') {
+        setTimeout(() => {
+            playBeep(900, 220, 0.1); // Slightly lower pitched beep for 4-7-8 session start
+        }, 500);
+    }
+    
     updatePhaseDisplay(type);
     
     meditationState.phaseTimer = setInterval(() => {
@@ -143,6 +202,13 @@ function startPhaseTimer(type) {
         }
         
         if (meditationState.phaseTimeRemaining <= 0) {
+            // Play beep sound for phase transition (helpful for eyes-closed meditation)
+            if (type === 'box') {
+                playBeep(800, 150, 0.08); // Gentle beep for box breathing phase transitions
+            } else if (type === '478') {
+                playBeep(750, 180, 0.08); // Slightly lower pitched beep for 4-7-8 breathing
+            }
+            
             // Move to next phase
             meditationState.currentPhase = (meditationState.currentPhase + 1) % phases.length;
             
@@ -173,6 +239,19 @@ function updatePhaseDisplay(type) {
     if (counterElement) {
         counterElement.textContent = meditationState.phaseTimeRemaining;
     }
+    
+    // Add breathing animation for Box Breathing
+    if (type === 'box') {
+        const iconContainer = document.querySelector(`#box-breathing-session .meditation-icon-container`);
+        if (iconContainer) {
+            // Remove all animation classes
+            iconContainer.classList.remove('inhale', 'hold', 'exhale', 'hold-empty');
+            
+            // Add appropriate class based on current phase
+            const phaseClasses = ['inhale', 'hold', 'exhale', 'hold-empty'];
+            iconContainer.classList.add(phaseClasses[meditationState.currentPhase]);
+        }
+    }
 }
 
 function updateProgressRing(type, progress) {
@@ -199,6 +278,17 @@ function completeMeditationSession(type) {
     if (meditationState.phaseTimer) {
         clearInterval(meditationState.phaseTimer);
         meditationState.phaseTimer = null;
+    }
+    
+    // Play completion beep sequence (helpful for eyes-closed meditation)
+    if (type === 'box') {
+        playBeep(1000, 150, 0.08);
+        setTimeout(() => playBeep(1200, 150, 0.08), 200);
+        setTimeout(() => playBeep(1400, 200, 0.08), 400);
+    } else if (type === '478') {
+        playBeep(900, 150, 0.08);
+        setTimeout(() => playBeep(1100, 150, 0.08), 200);
+        setTimeout(() => playBeep(1300, 200, 0.08), 400);
     }
     
     // Show completion notification

@@ -43,6 +43,18 @@ body {
     align-items: center;
     font-size: 1.2rem;
     font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.nav-logo:hover {
+    opacity: 0.8;
+    text-decoration: none;
+}
+
+.nav-logo:hover .logo-text {
+    color: #ffffff;
 }
 
 .logo-brackets {
@@ -955,9 +967,9 @@ body {
 
 .contact-methods {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 2rem;
-    max-width: 500px;
+    max-width: 900px;
     margin: 0 auto;
 }
 
@@ -3967,11 +3979,57 @@ body {
     justify-content: center;
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 4s ease-in-out;
+}
+
+/* Breathing Phase Animations */
+.meditation-icon-container.inhale {
+    transform: translate(-50%, -50%) scale(0.7);
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.meditation-icon-container.hold {
+    transform: translate(-50%, -50%) scale(0.7);
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.meditation-icon-container.exhale {
+    transform: translate(-50%, -50%) scale(1.2);
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.meditation-icon-container.hold-empty {
+    transform: translate(-50%, -50%) scale(1.2);
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.15);
 }
 
 .meditation-icon {
     font-size: 4rem;
-    animation: breathe 4s infinite ease-in-out;
+    transition: all 4s ease-in-out;
+}
+
+.meditation-icon-container.inhale .meditation-icon {
+    font-size: 3rem;
+    opacity: 0.9;
+}
+
+.meditation-icon-container.hold .meditation-icon {
+    font-size: 3rem;
+    opacity: 1;
+}
+
+.meditation-icon-container.exhale .meditation-icon {
+    font-size: 4.5rem;
+    opacity: 0.8;
+}
+
+.meditation-icon-container.hold-empty .meditation-icon {
+    font-size: 4.5rem;
+    opacity: 0.7;
 }
 
 /* Session Info */
@@ -4118,6 +4176,20 @@ body {
     .meditation-icon-container {
         width: 160px;
         height: 160px;
+    }
+    
+    /* Mobile breathing animations */
+    .meditation-icon-container.inhale {
+        transform: translate(-50%, -50%) scale(0.6);
+    }
+    
+    .meditation-icon-container.exhale {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    
+    .meditation-icon-container.hold,
+    .meditation-icon-container.hold-empty {
+        transform: translate(-50%, -50%) scale(0.6);
     }
     
     .meditation-icon {
