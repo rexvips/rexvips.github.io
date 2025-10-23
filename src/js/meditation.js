@@ -23,7 +23,8 @@ const meditationState = {
         '478': [4, 7, 8]
     },
     audioContext: null,
-    beepEnabled: true
+    beepEnabled: true,
+    isMuted: true // Muted by default
 };
 
 // Audio functionality for meditation beeps
@@ -39,7 +40,7 @@ function initAudioContext() {
 }
 
 function playBeep(frequency = 800, duration = 200, volume = 0.1) {
-    if (!meditationState.beepEnabled || !meditationState.audioContext) {
+    if (!meditationState.beepEnabled || !meditationState.audioContext || meditationState.isMuted) {
         return;
     }
     
@@ -75,6 +76,9 @@ function initMeditationApp() {
     
     // Initialize progress rings
     initProgressRings();
+    
+    // Initialize mute icons
+    updateMuteIcons();
 }
 
 function bindMeditationEvents() {
@@ -102,9 +106,15 @@ function bindMeditationEvents() {
         breathing478Complete.addEventListener('click', () => completeMeditationSession('478'));
     }
     
+    // Mute toggle button
+    const muteButtons = document.querySelectorAll('.mute-toggle');
+    muteButtons.forEach(button => {
+        button.addEventListener('click', toggleMute);
+    });
+    
     // Haptic feedback on tap
     document.addEventListener('click', function(e) {
-        if (meditationState.isRunning && e.target.closest('.meditation-session-screen')) {
+        if (meditationState.isRunning && e.target.closest('.meditation-session-screen') && !e.target.closest('.mute-toggle')) {
             triggerHapticFeedback();
         }
     });
@@ -339,6 +349,29 @@ function returnToSelectionScreen(type) {
     
     // Reset progress rings
     initProgressRings();
+}
+
+function toggleMute() {
+    meditationState.isMuted = !meditationState.isMuted;
+    updateMuteIcons();
+    
+    // Play a test beep when unmuting to confirm audio is working
+    if (!meditationState.isMuted) {
+        setTimeout(() => {
+            playBeep(800, 100, 0.05);
+        }, 100);
+    }
+}
+
+function updateMuteIcons() {
+    const muteButtons = document.querySelectorAll('.mute-toggle');
+    muteButtons.forEach(button => {
+        const icon = button.querySelector('.mute-icon');
+        if (icon) {
+            icon.textContent = meditationState.isMuted ? '🔇' : '🔊';
+            button.title = meditationState.isMuted ? 'Unmute beep sounds' : 'Mute beep sounds';
+        }
+    });
 }
 
 function triggerHapticFeedback() {
