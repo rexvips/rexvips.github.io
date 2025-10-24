@@ -10,7 +10,7 @@ const meditationState = {
     sessionTimer: null,
     phaseTimer: null,
     sessionStartTime: null,
-    sessionDuration: 5 * 60, // 5 minutes in seconds
+    sessionDuration: 10 * 60, // 10 minutes in seconds
     currentPhase: 0,
     phaseTimeRemaining: 0,
     cycleCount: 1,
