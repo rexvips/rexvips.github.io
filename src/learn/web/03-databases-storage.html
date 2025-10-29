@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Databases & Storage - Principal/Staff Engineer Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Databases & Storage for Principal/Staff Engineers</h1>
+            <div class="subtitle">Master database internals, storage engines, transaction processing, and data modeling strategies for high-performance, scalable systems.</div>
+        </header>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="01-system-design.html">System Design</a></li>
+                <li><a href="02-distributed-systems.html">Distributed Systems</a></li>
+                <li><a href="03-databases-storage.html" class="active">Databases & Storage</a></li>
+                <li><a href="04-performance-jvm.html">Performance & JVM</a></li>
+                <li><a href="05-event-driven-kafka.html">Event-Driven & Kafka</a></li>
+                <li><a href="06-observability-monitoring.html">Observability</a></li>
+                <li><a href="07-security-compliance.html">Security & Compliance</a></li>
+                <li><a href="08-leadership-tradeoffs.html">Leadership & Trade-offs</a></li>
+                <li><a href="09-testing-cicd.html">Testing & CI/CD</a></li>
+                <li><a href="10-algorithms-datastructures.html">Algorithms & Data Structures</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <div class="toc">
+                <h2>Table of Contents</h2>
+                <ol>
+                    <li><a href="#oltp-vs-olap-architecture">OLTP vs OLAP Architecture</a></li>
+                    <li><a href="#storage-engines">Storage Engines</a></li>
+                    <li><a href="#indexing-strategies">Indexing Strategies</a></li>
+                    <li><a href="#sharding-partitioning">Sharding & Partitioning</a></li>
+                    <li><a href="#transaction-isolation">Transaction Isolation</a></li>
+                    <li><a href="#distributed-transactions">Distributed Transactions</a></li>
+                    <li><a href="#query-optimization">Query Optimization</a></li>
+                    <li><a href="#data-modeling">Data Modeling</a></li>
+                    <li><a href="#backup-recovery">Backup & Recovery</a></li>
+                    <li><a href="#database-migrations">Database Migrations</a></li>
+                    <li><a href="#performance-monitoring">Performance Monitoring</a></li>
+                    <li><a href="#storage-economics">Storage Economics</a></li>
+                </ol>
+            </div>
+
+            <section id="oltp-vs-olap-architecture">
+                <h2>OLTP vs OLAP Architecture</h2>
+                
+                <div class="question">
+                    <h3>Q1: Design a data architecture supporting both real-time transaction processing (10K TPS) and analytical queries without impacting transactional performance.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement lambda architecture with OLTP for transactions, ETL pipeline for data transformation, and OLAP for analytics, using change data capture for real-time synchronization without performance impact.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design separate OLTP and OLAP systems optimized for their specific workloads. Use row-oriented database (PostgreSQL, MySQL) for OLTP with normalized schemas optimizing for insert/update performance. Deploy column-oriented database (Clickhouse, Snowflake) for OLAP with denormalized star/snowflake schemas optimizing for aggregation queries.</p>
+
+                            <p>Implement change data capture (CDC) using database logs (binlog, WAL) to stream changes from OLTP to OLAP systems with minimal performance impact. Use message queues (Kafka) for reliable delivery and buffering during maintenance windows. Transform data during ingestion to match analytical schema requirements.</p>
+
+                            <p>For near real-time analytics, deploy hybrid approaches: maintain hot data in operational stores with limited analytical capabilities, while cold data resides in optimized analytical stores. Use materialized views for frequently accessed aggregations, refreshed via CDC triggers.</p>
+
+                            <p>Calculate capacity requirements: 10K TPS with 2KB average transaction size requires 20MB/s write throughput. Plan for 10x peak capacity (100K TPS). OLAP storage grows with retention requirements: 1 year retention ≈ 630TB raw data, requiring 3x storage for replication and compression considerations.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Data freshness (CDC lag 5-30 seconds) vs transactional performance. Storage costs (2-3x for separate systems) vs query performance optimization. ETL complexity vs schema flexibility.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle schema evolution between OLTP and OLAP systems?</li>
+                                <li>What's your strategy for handling analytical queries that require real-time data?</li>
+                                <li>How do you implement data lineage tracking across OLTP and OLAP systems?</li>
+                                <li>What's your approach for handling data quality issues in the ETL pipeline?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure data privacy compliance across OLTP and OLAP systems?</li>
+                                <li>What monitoring validates data consistency between transactional and analytical stores?</li>
+                                <li>How do you balance ETL processing costs vs data freshness requirements?</li>
+                                <li>What's your disaster recovery strategy for coordinated OLTP/OLAP system failures?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of workload characteristics and business requirements driving architectural decisions.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="storage-engines">
+                <h2>Storage Engines</h2>
+                
+                <div class="question">
+                    <h3>Q2: Compare B-tree, LSM-tree, and in-memory storage engines for a high-write, mixed-read workload system. Which would you choose and why?</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> LSM-trees excel for write-heavy workloads with eventual consistency tolerance, B-trees provide consistent read performance, and in-memory engines offer lowest latency but require careful memory management and persistence strategies.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>B-tree engines (InnoDB, PostgreSQL) provide consistent O(log n) performance for both reads and writes with in-place updates. They suit workloads requiring consistent response times and strong consistency. Write amplification is higher due to page-level updates, but read performance remains predictable even during heavy write periods.</p>
+
+                            <p>LSM-tree engines (RocksDB, Cassandra) optimize for write throughput using sequential writes to immutable sorted runs, periodically compacting to remove deleted entries and merge levels. Write amplification occurs during compaction, but initial writes are very fast. Read performance varies based on compaction state and requires bloom filters for efficient lookups.</p>
+
+                            <p>In-memory engines (Redis, SAP HANA) eliminate disk I/O latency but require strategies for persistence and memory management. Use write-ahead logging for durability and snapshotting for recovery. Memory optimization techniques include compression, data structure selection, and garbage collection tuning.</p>
+
+                            <p>For high-write mixed-read workloads, LSM-trees typically perform best due to superior write throughput. However, consider read amplification during compaction and implement appropriate caching strategies. Use tiered storage: hot data in memory, warm data in SSD-based LSM-trees, cold data in B-tree stores.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Write performance vs read consistency. Memory efficiency vs access latency. Operational complexity vs performance optimization opportunities.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you tune LSM-tree compaction policies for optimal performance?</li>
+                                <li>What strategies mitigate read performance degradation during compaction storms?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you measure and optimize storage engine performance across different workload patterns?</li>
+                                <li>What strategies ensure storage engine choice remains optimal as data volume scales?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of workload patterns and their impact on storage engine selection.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="indexing-strategies">
+                <h2>Indexing Strategies</h2>
+                
+                <div class="question">
+                    <h3>Q3: Design an indexing strategy for a multi-tenant SaaS application with complex query patterns and varying tenant sizes.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement composite indexes with tenant isolation, partial indexes for large tenants, and adaptive indexing strategies based on tenant query patterns and data volume to optimize performance across diverse workloads.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design tenant-aware indexing starting with composite indexes (tenant_id, query_columns) to ensure efficient tenant isolation and query performance. For queries not filtering by tenant_id, create separate functional indexes but monitor for cross-tenant data leakage risks.</p>
+
+                            <p>Implement tiered indexing based on tenant size: small tenants share standard indexes, while large tenants (>1M records) get dedicated partial indexes. Use conditional indexing: `CREATE INDEX idx_large_tenant_orders ON orders (order_date, status) WHERE tenant_id = 'large_tenant_123'` to optimize storage and maintenance overhead.</p>
+
+                            <p>Deploy adaptive indexing using query pattern analysis: monitor slow query logs to identify missing indexes and automatically suggest/create indexes for frequently accessed patterns. Implement index usage monitoring to drop unused indexes that consume storage and slow down writes.</p>
+
+                            <p>For complex analytical queries, implement covering indexes including all needed columns to avoid table lookups. Use expression indexes for computed columns frequently used in WHERE clauses. Consider columnstore indexes for analytical workloads on specific tenant segments.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Storage overhead (30-50% for comprehensive indexing) vs query performance. Index maintenance cost during writes vs read optimization. Memory usage for index caches vs hit rates.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle index maintenance during tenant data migrations?</li>
+                                <li>What's your approach for balancing index creation vs. write performance degradation?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you measure indexing ROI across different tenant segments?</li>
+                                <li>What strategies ensure indexing strategies scale with tenant growth and query evolution?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize monitoring-driven decisions and understanding of multi-tenancy challenges.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sharding-partitioning">
+                <h2>Sharding & Partitioning</h2>
+                
+                <div class="question">
+                    <h3>Q4: Design a database sharding strategy for a social media platform handling 1B users with uneven activity patterns (celebrity vs regular user content).</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement hybrid sharding combining user-based partitioning with activity-aware routing, hot shard detection, and dynamic rebalancing to handle celebrity traffic spikes while maintaining performance for regular users.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement hierarchical sharding starting with geographic partitioning (US, EU, APAC) for data locality, then user-based sharding within regions using consistent hashing on user_id. Plan for 1000 initial shards supporting 1M users each, allowing for growth to 10B users without major resharding.</p>
+
+                            <p>Address celebrity hotspots using activity-based routing: monitor shard metrics (QPS, CPU, memory) and automatically promote high-activity users to dedicated shards or read replica clusters. Implement shadow traffic analysis to predict viral content before it overwhelms shards.</p>
+
+                            <p>Deploy adaptive partitioning for content distribution: trending posts get replicated across multiple shards for read performance, while normal posts remain on home shards. Use bloom filters to quickly determine post location without cross-shard queries.</p>
+
+                            <p>For follower relationships, implement bidirectional sharding: store following relationships on user's home shard, follower relationships on followed user's shard. This optimizes for both "user's timeline" and "who follows X" queries. Use fan-out strategies during post creation: push to active followers' timelines, pull for inactive followers.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Query complexity for cross-shard operations vs scalability. Storage overhead (2-3x for replication) vs read performance. Operational complexity of hotspot management vs user experience during viral events.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle friend recommendations across sharded user data?</li>
+                                <li>What's your strategy for migrating celebrity users between shard tiers?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you measure and optimize sharding effectiveness for different user behavior patterns?</li>
+                                <li>What strategies ensure sharding scales with viral content patterns and user growth?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of social media specific challenges and data access patterns.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="transaction-isolation">
+                <h2>Transaction Isolation</h2>
+                
+                <div class="question">
+                    <h3>Q5: Explain how you would implement serializable isolation in a distributed database while maintaining high performance for a financial trading system.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Use optimistic concurrency control with timestamp ordering, conflict detection through dependency tracking, and strategic retry policies to achieve serializable isolation while minimizing performance impact in high-throughput trading scenarios.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement Serializable Snapshot Isolation (SSI) using optimistic concurrency control to avoid locking overhead during transaction execution. Assign logical timestamps to transactions and track read/write dependencies to detect serialization anomalies before commit.</p>
+
+                            <p>Use predicate locking for range queries to prevent phantom reads while minimizing lock contention. Implement conflict detection through dependency graphs: if transaction T1 reads data that T2 modifies, and T2 commits first, abort T1 if it would violate serializable ordering.</p>
+
+                            <p>Deploy strategic retry policies with exponential backoff and jitter to handle abort storms during high contention periods. For read-heavy workloads, use read-only transaction optimization where reads never abort and always see consistent snapshots.</p>
+
+                            <p>For performance optimization in trading systems, implement transaction batching for related operations and use application-level conflict detection to pre-validate transactions before database submission. Deploy hot-cold data separation: frequently traded instruments use in-memory storage with different isolation strategies than historical data.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Abortion rates (5-15% typical) vs consistency guarantees. CPU overhead for conflict detection vs correctness requirements. Latency spikes during retry storms vs throughput optimization.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you tune abort retry policies for optimal throughput?</li>
+                                <li>What metrics indicate when to switch from optimistic to pessimistic concurrency control?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you measure and validate serializable isolation effectiveness in production systems?</li>
+                                <li>What strategies ensure transaction isolation performance scales with trading volume?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of financial system requirements and regulatory compliance implications.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="distributed-transactions">
+                <h2>Distributed Transactions</h2>
+                
+                <div class="question">
+                    <h3>Q6: Design a cross-database transaction mechanism for order processing spanning inventory, payment, and shipping services without using 2PC.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement saga pattern with event choreography, compensating actions, and process monitoring to maintain transaction semantics across distributed services while avoiding distributed locking issues.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design choreography-based saga where each service publishes events after successful local transactions, triggering subsequent steps in the workflow. Order service initiates by publishing OrderCreated event, inventory service reserves items and publishes InventoryReserved, payment service processes and publishes PaymentCompleted.</p>
+
+                            <p>Implement compensating actions for each step: CancelInventoryReservation, RefundPayment, CancelShipping. Each service maintains compensation logic and subscribes to relevant failure events. Use timeout-based detection for stuck transactions with automatic compensation triggering.</p>
+
+                            <p>Deploy saga state tracking using event sourcing: store all saga events with correlation IDs for audit trails and recovery. Implement saga orchestrator as fallback for complex workflows requiring centralized coordination and compensation ordering.</p>
+
+                            <p>Use outbox pattern within each service: write business state changes and outgoing events in the same database transaction, then publish events asynchronously via change data capture. This ensures atomicity between state changes and event publishing, preventing lost events during failures.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Eventual consistency vs immediate consistency. Implementation complexity vs system availability during partial failures. Compensation logic maintenance vs business requirement flexibility.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle cascading compensations in complex saga workflows?</li>
+                                <li>What monitoring alerts indicate saga execution problems?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you measure and optimize saga performance across different failure scenarios?</li>
+                                <li>What strategies ensure distributed transaction correctness scales with system complexity?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize business impact understanding and operational considerations for distributed transaction failures.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="query-optimization">
+                <h2>Query Optimization</h2>
+                
+                <div class="question">
+                    <h3>Q7: Optimize a complex analytical query joining 5 tables with 100M+ rows each, currently taking 45 minutes to execute.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Apply systematic optimization including index analysis, join reordering, partition elimination, parallel execution, and materialized view strategies to reduce query execution time by orders of magnitude.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Start with execution plan analysis to identify bottlenecks: table scans, nested loop joins, and sort operations consuming excessive time. Create covering indexes for join columns and frequently filtered attributes. Use composite indexes matching query's WHERE and ORDER BY clauses.</p>
+
+                            <p>Implement partition elimination by restructuring queries to include partition key filters. If querying time-series data, add date range filters matching partition boundaries. Use partition-wise joins when both tables are partitioned on join keys.</p>
+
+                            <p>Optimize join order using cost-based optimization: join smaller result sets first, use hash joins for large tables, and nested loop joins for small lookups. Consider denormalization for frequently joined tables, trading storage for query performance.</p>
+
+                            <p>Deploy parallel query execution with appropriate degree of parallelism (DOP). For 100M row tables, use DOP 4-8 depending on available CPU cores and I/O capacity. Monitor parallel execution efficiency and adjust based on resource utilization.</p>
+
+                            <p>Create materialized views for complex aggregations, refreshed incrementally using change data capture. For recurring analytical queries, pre-aggregate data using OLAP cubes or summary tables updated via ETL processes.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Storage costs for indexes and materialized views vs query performance. Write performance degradation vs read optimization. Memory usage for parallel execution vs query completion time.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle query optimization when data distribution changes over time?</li>
+                                <li>What's your approach for optimizing queries with dynamic WHERE clauses?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you measure and validate query optimization effectiveness across different data volumes?</li>
+                                <li>What strategies ensure query performance remains optimal as data and query patterns evolve?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show systematic approach to performance analysis and quantifiable improvement metrics.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="data-modeling">
+                <h2>Data Modeling</h2>
+                
+                <div class="question">
+                    <h3>Q8: Design a data model for a social media platform supporting posts, comments, likes, and user relationships while optimizing for both read and write performance.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement hybrid data modeling using normalized relational design for transactional data and denormalized NoSQL design for read-heavy social feeds, with event sourcing for audit trails and real-time updates.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design normalized relational schema for core entities (users, posts, comments) ensuring referential integrity and ACID properties for critical operations like user registration and content creation. Use foreign keys and junction tables for many-to-many relationships (user follows, post likes) with proper indexing on relationship queries.</p>
+
+                            <p>Implement denormalized document store (MongoDB, DynamoDB) for social feeds and user timelines, embedding frequently accessed data to minimize joins. Pre-compute and store aggregated metrics (like counts, follower counts) to avoid expensive real-time calculations. Use write-time denormalization where feed updates happen during post creation rather than read-time aggregation.</p>
+
+                            <p>Deploy event sourcing for user activity streams, capturing all social interactions as immutable events. This enables powerful analytics, A/B testing, and machine learning features while providing complete audit trails. Use CQRS to separate write-optimized command models from read-optimized projection models for different query patterns.</p>
+
+                            <p>Handle data consistency using eventual consistency for social features (likes, follows can be slightly delayed) while maintaining strong consistency for critical operations (financial transactions, content ownership). Implement conflict resolution strategies for concurrent updates and use distributed locking for operations requiring atomicity across multiple documents.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Storage overhead from denormalization (2-3x increase) vs query performance. Eventual consistency social features vs user experience expectations. Event sourcing benefits vs storage and complexity costs.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle schema evolution in denormalized social media data without breaking existing features?</li>
+                                <li>What's your strategy for modeling hierarchical data like nested comment threads with unlimited depth?</li>
+                                <li>How do you implement efficient pagination for social feeds with millions of posts?</li>
+                                <li>What's your approach for modeling temporal data like post edit history and user profile changes?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure data model performance scales with user base growth from 1M to 100M users?</li>
+                                <li>What strategies prevent data modeling decisions from creating performance bottlenecks?</li>
+                                <li>How do you validate data model effectiveness and identify optimization opportunities?</li>
+                                <li>What's your approach for data model governance and preventing schema drift across teams?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of different data modeling approaches and demonstrate ability to choose the right model based on specific access patterns and performance requirements.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="backup-recovery">
+                <h2>Backup & Recovery</h2>
+                
+                <div class="question">
+                    <h3>Q9: Design a backup and recovery strategy for a financial database requiring RPO < 5 minutes and RTO < 15 minutes with 7-year retention requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement continuous transaction log shipping with point-in-time recovery, deploy automated backup verification and restoration testing, and design tiered storage strategy for long-term retention compliance.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement continuous transaction log shipping to standby systems every 1-2 minutes, ensuring RPO requirements. Use write-ahead logging with synchronous replication to local standby and asynchronous replication to remote disaster recovery sites. Deploy log archive compression and encryption for secure long-term storage with immutable backup guarantees.</p>
+
+                            <p>Design automated backup verification using backup restoration to isolated test environments with data integrity checking. Implement monthly full database restores to verify backup completeness and measure actual RTO performance. Use backup catalog systems to track backup metadata, retention policies, and restoration procedures.</p>
+
+                            <p>Deploy tiered storage architecture: hot backups (last 30 days) on high-performance SSD storage for fast recovery, warm backups (1 year) on standard storage, and cold backups (7 years) on glacier-class storage for compliance. Implement automated lifecycle management to transition backups between storage tiers based on age and access patterns.</p>
+
+                            <p>Handle point-in-time recovery using transaction log replay with consistent snapshot isolation. Implement backup encryption with key rotation and secure key management. Deploy cross-region backup replication for disaster recovery with geographic diversity. Use backup deduplication and compression to optimize storage costs while maintaining recovery performance.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Backup frequency vs storage costs and I/O impact. Recovery speed vs backup verification thoroughness. Long-term storage costs vs compliance requirements (typically 15-20% of infrastructure budget).
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle backup and recovery for databases with millions of transactions per day?</li>
+                                <li>What's your strategy for backup validation without impacting production database performance?</li>
+                                <li>How do you implement selective restore for specific tables or time ranges?</li>
+                                <li>What's your approach for backup and recovery during database schema migrations?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure backup and recovery procedures meet regulatory audit requirements?</li>
+                                <li>What strategies prevent backup processes from impacting database performance during peak hours?</li>
+                                <li>How do you validate backup integrity and detect backup corruption before it's needed?</li>
+                                <li>What's your approach for backup and recovery cost optimization while maintaining compliance?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize the importance of regular backup testing and demonstrate understanding of compliance requirements in financial systems.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="database-migrations">
+                <h2>Database Migrations</h2>
+                
+                <div class="question">
+                    <h3>Q10: Design a zero-downtime database migration strategy for migrating a 10TB production database from MySQL to PostgreSQL while maintaining data consistency.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement dual-write migration pattern with change data capture, deploy gradual traffic shifting using feature flags, and design rollback mechanisms with data consistency validation throughout the migration process.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement dual-write migration pattern: initially sync historical data from MySQL to PostgreSQL using bulk data transfer tools. Then deploy application changes to write to both databases simultaneously while reading from MySQL. Use change data capture to ensure PostgreSQL stays synchronized with ongoing MySQL changes during the migration period.</p>
+
+                            <p>Deploy gradual traffic shifting using feature flags and user segmentation. Start with 1% read traffic to PostgreSQL, gradually increasing to 50%, then 100% as confidence builds. Implement automated rollback triggers based on error rates, latency metrics, or data consistency checks. Maintain MySQL as authoritative source until full migration completion.</p>
+
+                            <p>Design comprehensive data validation using checksums, row counts, and business logic validation queries running continuously during migration. Implement lag monitoring to ensure PostgreSQL stays within acceptable sync windows (typically <5 minutes). Use parallel data comparison tools to identify and resolve discrepancies quickly.</p>
+
+                            <p>Handle schema differences using transformation layers: convert MySQL-specific data types, indexes, and constraints to PostgreSQL equivalents. Implement application compatibility layers for database-specific SQL features. Plan for performance testing with production-scale data to identify and resolve PostgreSQL optimization requirements before full cutover.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Migration duration (3-6 months) vs risk minimization. Dual-write complexity and storage costs vs zero-downtime requirements. Validation thoroughness vs migration performance impact.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle database migration when applications have embedded SQL that's database-specific?</li>
+                                <li>What's your strategy for migrating stored procedures and database functions to different database systems?</li>
+                                <li>How do you implement database migration rollback when data has been modified in the new system?</li>
+                                <li>What's your approach for handling foreign key relationships during incremental migration?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure database migration doesn't violate data privacy or compliance requirements?</li>
+                                <li>What strategies prevent database migration from impacting application performance during the process?</li>
+                                <li>How do you validate migration success and detect data corruption or loss?</li>
+                                <li>What's your approach for managing database migration costs and timeline expectations?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding that database migrations are high-risk operations requiring careful planning and demonstrate knowledge of incremental migration strategies.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="performance-monitoring">
+                <h2>Performance Monitoring</h2>
+                
+                <div class="question">
+                    <h3>Q11: Design a comprehensive database performance monitoring system for a multi-tenant SaaS platform with 1000+ databases requiring proactive performance issue detection.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement multi-layer monitoring with query performance analytics, resource utilization tracking, and predictive alerting using machine learning to identify performance degradation before it impacts users.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy comprehensive metrics collection covering query performance (execution time, plans, locks), resource utilization (CPU, memory, I/O, connections), and application metrics (transaction throughput, error rates). Use database-specific monitoring tools (pg_stat_statements, MySQL Performance Schema) combined with infrastructure monitoring for complete visibility.</p>
+
+                            <p>Implement query performance analytics with automatic slow query detection, execution plan analysis, and index usage monitoring. Track query fingerprints to identify frequently executed slow queries and deployment-related performance regressions. Use query plan stability monitoring to detect optimizer changes that degrade performance.</p>
+
+                            <p>Design predictive alerting using machine learning models trained on historical performance patterns. Detect anomalies in query latency, connection pool exhaustion, and resource utilization trends before they cause user-visible issues. Implement tenant-specific performance baselines to account for varying usage patterns across customers.</p>
+
+                            <p>Deploy automated performance optimization recommendations: suggest missing indexes based on query patterns, identify unused indexes consuming resources, and recommend table partitioning for growing datasets. Implement performance regression detection during deployments with automatic rollback triggers for significant performance degradation.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Monitoring overhead (5-10% performance impact) vs observability benefits. Alert sensitivity vs false positive noise. Automated optimization vs human oversight and validation.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle performance monitoring for databases with highly variable workload patterns?</li>
+                                <li>What's your strategy for correlating database performance issues with application-level problems?</li>
+                                <li>How do you implement performance monitoring for read replicas and distributed database clusters?</li>
+                                <li>What's your approach for performance monitoring during database maintenance and upgrades?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure performance monitoring doesn't impact database performance during peak loads?</li>
+                                <li>What strategies prevent performance monitoring from generating alert fatigue for operations teams?</li>
+                                <li>How do you validate performance monitoring accuracy and detect monitoring system issues?</li>
+                                <li>What's your approach for performance monitoring cost optimization while maintaining effectiveness?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of proactive monitoring approaches and demonstrate knowledge of how to balance monitoring overhead with operational visibility needs.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="storage-economics">
+                <h2>Storage Economics</h2>
+                
+                <div class="question">
+                    <h3>Q12: Design a storage cost optimization strategy for a data platform managing 500TB of data with different access patterns and retention requirements while maintaining performance SLAs.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement intelligent data tiering with automated lifecycle management, deploy compression and deduplication strategies, and design cost-aware data architecture with usage-based optimization to minimize storage costs while meeting performance requirements.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement automated data tiering based on access patterns: hot data (accessed daily) on high-performance SSD, warm data (accessed monthly) on standard storage, and cold data (accessed yearly) on glacier-class storage. Use access pattern analytics to automatically transition data between tiers, achieving 60-80% storage cost reduction while maintaining performance for active data.</p>
+
+                            <p>Deploy intelligent compression strategies tailored to data types: use columnar compression for analytical workloads (achieving 5-10x compression ratios), row-level compression for transactional data, and specialized compression for time-series data. Implement deduplication at block and file levels to eliminate redundant data, particularly effective for backup and archive storage.</p>
+
+                            <p>Design cost-aware data architecture with retention policies aligned to business value and compliance requirements. Implement automated data archival and deletion based on data age, business rules, and regulatory requirements. Use data cataloging to identify unused or low-value datasets for removal. Deploy data sampling and summarization for historical analytics to reduce storage requirements.</p>
+
+                            <p>Optimize storage economics using cloud provider pricing models: leverage spot instances for batch processing workloads, use reserved capacity for predictable storage needs, and implement multi-region replication strategies that balance cost and availability requirements. Monitor storage costs per business unit and implement chargeback models to encourage efficient data usage.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Storage cost reduction (60-80% savings) vs data access latency for tiered storage. Compression CPU overhead vs storage savings. Automated lifecycle management vs data governance control.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle storage economics for data with unpredictable access patterns?</li>
+                                <li>What's your strategy for balancing storage costs with disaster recovery and compliance requirements?</li>
+                                <li>How do you implement storage cost optimization without impacting data availability SLAs?</li>
+                                <li>What's your approach for forecasting storage costs as data volume grows exponentially?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure storage cost optimization doesn't compromise data security or compliance?</li>
+                                <li>What strategies prevent storage cost optimization from creating performance bottlenecks?</li>
+                                <li>How do you validate storage cost optimization effectiveness and ROI measurement?</li>
+                                <li>What's your approach for storage economics governance and preventing cost optimization conflicts?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of the business impact of storage costs and show knowledge of how to optimize costs while maintaining system reliability and performance.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="study-guide">
+                <h2>How to Use This Study Guide</h2>
+                
+                <h3>Study Approach</h3>
+                <ul>
+                    <li>Practice with actual database systems, not just theory</li>
+                    <li>Set up test environments to experiment with storage engines and indexing</li>
+                    <li>Work through capacity planning calculations for realistic scenarios</li>
+                    <li>Study actual query execution plans from production systems</li>
+                </ul>
+
+                <h3>Mock Interview Pacing</h3>
+                <ul>
+                    <li>Define requirements and constraints (5 minutes)</li>
+                    <li>Design data model and storage strategy (15 minutes)</li>
+                    <li>Discuss scalability and performance optimizations (15 minutes)</li>
+                    <li>Address operational concerns and monitoring (10 minutes)</li>
+                </ul>
+
+                <h3>Hands-on Practice</h3>
+                <p>Set up local databases (PostgreSQL, MySQL, MongoDB) to experiment with different storage engines, create indexes, and analyze query performance. Practice reading and interpreting execution plans.</p>
+            </div>
+        </main>
+
+        <a href="#" class="back-to-top">↑</a>
+    </div>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        window.addEventListener('scroll', function() {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+
+        document.querySelector('.back-to-top').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

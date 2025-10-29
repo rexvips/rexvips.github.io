@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security & Compliance - Principal/Staff Engineer Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Security & Compliance for Principal/Staff Engineers</h1>
+            <div class="subtitle">Master authentication, authorization, encryption, and compliance frameworks essential for building secure, auditable systems at enterprise scale.</div>
+        </header>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="01-system-design.html">System Design</a></li>
+                <li><a href="02-distributed-systems.html">Distributed Systems</a></li>
+                <li><a href="03-databases-storage.html">Databases & Storage</a></li>
+                <li><a href="04-performance-jvm.html">Performance & JVM</a></li>
+                <li><a href="05-event-driven-kafka.html">Event-Driven & Kafka</a></li>
+                <li><a href="06-observability-monitoring.html">Observability</a></li>
+                <li><a href="07-security-compliance.html" class="active">Security & Compliance</a></li>
+                <li><a href="08-leadership-tradeoffs.html">Leadership & Trade-offs</a></li>
+                <li><a href="09-testing-cicd.html">Testing & CI/CD</a></li>
+                <li><a href="10-algorithms-datastructures.html">Algorithms & Data Structures</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <div class="toc">
+                <h2>Table of Contents</h2>
+                <ol>
+                    <li><a href="#authentication-architecture">Authentication Architecture</a></li>
+                    <li><a href="#authorization-rbac">Authorization & RBAC</a></li>
+                    <li><a href="#data-encryption">Data Encryption</a></li>
+                    <li><a href="#api-security">API Security</a></li>
+                    <li><a href="#audit-trails-compliance">Audit Trails & Compliance</a></li>
+                    <li><a href="#secret-management">Secret Management</a></li>
+                    <li><a href="#network-security">Network Security</a></li>
+                    <li><a href="#vulnerability-management">Vulnerability Management</a></li>
+                    <li><a href="#privacy-data-protection">Privacy & Data Protection</a></li>
+                    <li><a href="#security-monitoring">Security Monitoring</a></li>
+                    <li><a href="#incident-response">Incident Response</a></li>
+                    <li><a href="#compliance-frameworks">Compliance Frameworks</a></li>
+                </ol>
+            </div>
+
+            <section id="authentication-architecture">
+                <h2>Authentication Architecture</h2>
+                
+                <div class="question">
+                    <h3>Q1: Design an authentication system for a multi-tenant SaaS platform supporting SSO, MFA, and API access with 10M+ users across enterprise and consumer segments.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement OAuth2/OIDC federation with JWT tokens, multi-factor authentication, tenant isolation, and scalable session management to support diverse authentication requirements while maintaining security and performance.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design OAuth2/OIDC architecture using identity providers (Auth0, Keycloak, AWS Cognito) with tenant-specific configuration supporting SAML, LDAP, and social login providers. Implement JWT token architecture with short-lived access tokens (15 minutes) and longer-lived refresh tokens (7 days) with secure rotation policies.</p>
+
+                            <p>Deploy multi-factor authentication supporting TOTP, SMS, hardware tokens, and biometric authentication with risk-based adaptive authentication. Implement device trust and geo-location analysis to reduce MFA friction for trusted environments while maintaining security for suspicious access patterns.</p>
+
+                            <p>Implement tenant isolation through token namespacing and audience validation. Use tenant-specific signing keys for JWT tokens to prevent cross-tenant token abuse. Deploy rate limiting per tenant and user to prevent brute force attacks and resource exhaustion.</p>
+
+                            <p>Design session management with distributed session storage (Redis Cluster) supporting horizontal scaling and cross-region replication. Implement secure session invalidation, concurrent session limits, and suspicious activity detection with automatic session termination.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Authentication latency (100-300ms) vs security verification depth. Token storage overhead vs stateless scalability. MFA user experience vs security requirements.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle authentication during identity provider outages without compromising security?</li>
+                                <li>What's your strategy for migrating users between authentication providers during acquisitions?</li>
+                                <li>How do you implement step-up authentication for sensitive operations within applications?</li>
+                                <li>How do you handle authentication for mobile applications with intermittent connectivity?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure authentication systems meet performance SLAs during peak load?</li>
+                                <li>What strategies prevent authentication bottlenecks from impacting application availability?</li>
+                                <li>How do you validate authentication security without exposing vulnerabilities during testing?</li>
+                                <li>What's your approach for authentication system disaster recovery and failover?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize understanding of authentication scalability challenges and tenant security isolation requirements.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="authorization-rbac">
+                <h2>Authorization & RBAC</h2>
+                
+                <div class="question">
+                    <h3>Q2: Design a fine-grained authorization system for a healthcare platform requiring role-based access control, attribute-based permissions, and audit compliance with HIPAA requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement hierarchical RBAC with attribute-based access control (ABAC), policy engines, and comprehensive audit logging to ensure healthcare data access compliance while maintaining system performance and usability.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design hierarchical RBAC structure with roles (Doctor, Nurse, Administrator), permissions (read_patient_data, write_prescription), and resources (patient records, medical images) with inheritance patterns. Implement role hierarchies where senior roles inherit junior permissions while adding specialized access rights.</p>
+
+                            <p>Deploy attribute-based access control (ABAC) using policy engines (Open Policy Agent, AWS Cedar) for complex access decisions based on user attributes, resource properties, environmental context, and time-based constraints. Example: "Doctors can access patient records for patients under their care during business hours."</p>
+
+                            <p>Implement policy decision points (PDP) with caching for performance optimization and policy enforcement points (PEP) at application boundaries. Use distributed policy caching with invalidation strategies to balance access decision latency (target <10ms) with policy consistency requirements.</p>
+
+                            <p>Design comprehensive audit logging capturing all access decisions, policy evaluations, and administrative changes. Implement immutable audit trails with cryptographic integrity protection, automatic retention management, and HIPAA-compliant audit reporting capabilities.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Authorization decision latency vs granular access control. Policy complexity vs maintenance overhead. Audit logging volume vs compliance requirements.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle emergency access scenarios where normal authorization rules need bypassing?</li>
+                                <li>What's your strategy for managing role assignments during staff transitions and department changes?</li>
+                                <li>How do you implement time-based access controls for temporary staff or consultants?</li>
+                                <li>How do you handle authorization for batch processing and automated systems?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure authorization decisions remain consistent during policy updates?</li>
+                                <li>What strategies prevent authorization systems from becoming performance bottlenecks?</li>
+                                <li>How do you validate authorization correctness without exposing sensitive access patterns?</li>
+                                <li>What's your approach for authorization system testing and policy validation?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of healthcare compliance requirements and the balance between security and operational efficiency.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="data-encryption">
+                <h2>Data Encryption</h2>
+                
+                <div class="question">
+                    <h3>Q3: Design end-to-end encryption for a healthcare platform handling sensitive patient data with requirements for data-at-rest, data-in-transit, and application-level encryption.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement comprehensive encryption strategy using AES-256 for data-at-rest, TLS 1.3 for data-in-transit, and application-level field encryption for PII/PHI with secure key management and rotation policies.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy data-at-rest encryption using database native encryption (TDE) with AES-256-GCM, filesystem encryption for file storage, and object storage encryption (S3 SSE-KMS) with customer-managed keys. Implement column-level encryption for sensitive fields (SSN, medical records) using deterministic encryption for searchable fields and random encryption for non-searchable sensitive data.</p>
+
+                            <p>Implement data-in-transit protection using TLS 1.3 with perfect forward secrecy, certificate pinning for mobile applications, and mutual TLS (mTLS) for service-to-service communication. Deploy API gateway with WAF protection and DDoS mitigation for external-facing endpoints.</p>
+
+                            <p>Design application-level encryption using envelope encryption pattern: data encryption keys (DEKs) for individual records encrypted with key encryption keys (KEKs) managed by HSM or cloud KMS. Implement field-level tokenization for payment data and format-preserving encryption (FPE) for maintaining data format requirements.</p>
+
+                            <p>Deploy comprehensive key management with automated key rotation (quarterly for DEKs, annually for KEKs), key versioning for seamless decryption of historical data, and key escrow procedures for regulatory compliance and disaster recovery scenarios.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Encryption performance overhead (10-20% latency increase) vs data protection. Key management complexity vs security granularity. Searchability limitations with encrypted data vs privacy protection.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle encryption key recovery and disaster scenarios without compromising security?</li>
+                                <li>What's your strategy for encrypting data in distributed caching systems and search indexes?</li>
+                                <li>How do you implement encryption for real-time data streams and event processing?</li>
+                                <li>What's your approach for encryption performance optimization in high-throughput systems?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure encryption implementations meet healthcare compliance requirements (HIPAA)?</li>
+                                <li>What strategies prevent encryption from becoming a system performance bottleneck?</li>
+                                <li>How do you validate encryption effectiveness and detect potential vulnerabilities?</li>
+                                <li>What's your approach for encryption audit trails and compliance reporting?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of different encryption approaches and show knowledge of when to use each encryption type based on use case requirements.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="api-security">
+                <h2>API Security</h2>
+                
+                <div class="question">
+                    <h3>Q4: Design API security architecture for a financial services platform with public APIs, partner integrations, and internal microservices requiring different security controls and threat protection.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement layered API security using OAuth2 scopes, API gateway with rate limiting and threat protection, input validation, and comprehensive API monitoring with anomaly detection.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy OAuth2 with fine-grained scopes for API access control: read-only scopes for data access, write scopes for transactions, and administrative scopes for privileged operations. Implement client credential grants for service-to-service communication and authorization code grants for user-delegated access with PKCE for mobile applications.</p>
+
+                            <p>Configure API gateway with comprehensive security controls: rate limiting (per-client, per-endpoint, and global), request/response validation against OpenAPI schemas, SQL injection and XSS protection, and geographic access controls. Deploy Web Application Firewall (WAF) rules specific to API attack patterns.</p>
+
+                            <p>Implement API input validation using strict schema validation, parameterized queries for database access, and output encoding to prevent injection attacks. Deploy API versioning with security policy inheritance and deprecation timelines for legacy API versions with known vulnerabilities.</p>
+
+                            <p>Design comprehensive API monitoring with request/response logging (excluding sensitive data), anomaly detection for unusual access patterns, and real-time threat detection. Implement API security testing in CI/CD pipelines using tools like OWASP ZAP and dynamic security scanning.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> API security controls vs performance and latency impact. Fine-grained authorization vs system complexity. Comprehensive logging vs data privacy and storage costs.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle API security for GraphQL endpoints with complex query structures?</li>
+                                <li>What's your strategy for API security in microservices with service mesh architecture?</li>
+                                <li>How do you implement API security for real-time WebSocket and streaming connections?</li>
+                                <li>What's your approach for API security testing and penetration testing automation?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure API security controls meet financial industry regulations (PCI DSS)?</li>
+                                <li>What strategies prevent API security from impacting developer productivity and API adoption?</li>
+                                <li>How do you validate API security effectiveness and detect bypass attempts?</li>
+                                <li>What's your approach for API security incident response and threat intelligence integration?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of API attack vectors and demonstrate knowledge of defense-in-depth strategies for API protection.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="audit-trails-compliance">
+                <h2>Audit Trails & Compliance</h2>
+                
+                <div class="question">
+                    <h3>Q5: Design comprehensive audit trail system for a banking platform requiring immutable logs, regulatory reporting, and forensic investigation capabilities with 7-year retention.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement tamper-proof audit logging with cryptographic integrity, automated compliance reporting, real-time monitoring for suspicious activities, and efficient long-term storage with query capabilities.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy immutable audit logging using blockchain-style hash chaining or cryptographic signatures for log integrity verification. Store audit logs in append-only systems with write-once-read-many (WORM) storage compliance. Implement log encryption with time-locked decryption keys for long-term retention security.</p>
+
+                            <p>Design comprehensive audit event capture covering user actions, system changes, data access, privilege escalations, and configuration modifications. Include contextual information: user identity, IP address, timestamp, affected resources, and business context. Use structured logging formats (JSON) for automated processing and analysis.</p>
+
+                            <p>Implement automated compliance reporting using audit log analysis and aggregation. Generate regulatory reports (SOX, PCI DSS, Basel III) with automated data validation and exception reporting. Deploy real-time compliance monitoring with alerts for policy violations and suspicious activities.</p>
+
+                            <p>Create efficient audit trail storage architecture with hot/warm/cold data lifecycle management: recent logs (30 days) on fast storage for investigations, historical logs (1 year) on standard storage for reporting, and archived logs (7 years) on cold storage with retrieval capabilities for regulatory requests.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Comprehensive audit logging vs storage costs and system performance. Real-time monitoring vs processing overhead. Long-term retention vs query performance degradation.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle audit trail synchronization across distributed systems and time zones?</li>
+                                <li>What's your strategy for audit log privacy and redaction of sensitive information?</li>
+                                <li>How do you implement audit trail recovery and reconstruction after system failures?</li>
+                                <li>What's your approach for audit log analysis and forensic investigation automation?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure audit trails meet regulatory requirements across different jurisdictions?</li>
+                                <li>What strategies prevent audit logging from impacting system performance during peak loads?</li>
+                                <li>How do you validate audit trail completeness and detect missing audit events?</li>
+                                <li>What's your approach for audit trail cost optimization while maintaining compliance?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of regulatory requirements and show knowledge of balancing comprehensive auditing with system performance and costs.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="secret-management">
+                <h2>Secret Management</h2>
+                
+                <div class="question">
+                    <h3>Q6: Design a secret management system for a cloud-native application with automatic secret rotation, secure distribution, and zero-trust access patterns across multiple environments.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement centralized secret management using HashiCorp Vault or cloud-native solutions with automated rotation, dynamic secrets, secure injection mechanisms, and comprehensive audit capabilities.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy centralized secret management using HashiCorp Vault with high availability clustering, auto-unsealing, and multiple authentication backends (OIDC, Kubernetes, cloud IAM). Implement secret engines for different secret types: key-value for static secrets, database engines for dynamic credentials, and PKI engines for certificate management.</p>
+
+                            <p>Design automated secret rotation with configurable policies: database passwords rotated monthly, API keys rotated weekly, and certificates rotated annually with overlap periods for graceful transitions. Implement rotation coordination to ensure all consuming applications receive updated secrets before old secrets expire.</p>
+
+                            <p>Implement secure secret distribution using multiple injection mechanisms: Kubernetes secrets with CSI drivers, sidecar containers for legacy applications, and init containers for one-time secret retrieval. Deploy secret encryption in transit and at rest with envelope encryption patterns.</p>
+
+                            <p>Create zero-trust access patterns with short-lived tokens, just-in-time access provisioning, and principle of least privilege enforcement. Implement secret usage monitoring with anomaly detection for unusual access patterns and automated revocation capabilities for compromised secrets.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Secret management infrastructure complexity vs security benefits. Rotation frequency vs operational overhead. Dynamic secrets performance vs static secret simplicity.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle secret management for legacy applications without modern secret injection capabilities?</li>
+                                <li>What's your strategy for secret management during disaster recovery and cross-region failover?</li>
+                                <li>How do you implement secret management for CI/CD pipelines and build processes?</li>
+                                <li>What's your approach for secret management in development and testing environments?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure secret management doesn't become a single point of failure?</li>
+                                <li>What strategies prevent secret management overhead from impacting application performance?</li>
+                                <li>How do you validate secret management effectiveness and detect potential leaks?</li>
+                                <li>What's your approach for secret management compliance and audit requirements?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of secret lifecycle management and demonstrate knowledge of different secret distribution patterns based on application architecture.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="network-security">
+                <h2>Network Security</h2>
+                
+                <div class="question">
+                    <h3>Q7: Design network security architecture for a hybrid cloud environment with on-premises data centers, multiple cloud providers, and remote workforce access requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement zero-trust network architecture with micro-segmentation, secure connectivity (VPN, SD-WAN), network monitoring, and comprehensive threat detection across hybrid infrastructure.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy zero-trust network architecture with micro-segmentation using software-defined perimeters and network policies. Implement network access control (NAC) with device authentication, compliance checking, and dynamic VLAN assignment based on device trust levels and user roles.</p>
+
+                            <p>Configure secure connectivity using site-to-site VPNs for data center connections, cloud-native connectivity (AWS Direct Connect, Azure ExpressRoute) for high-bandwidth requirements, and SD-WAN for branch office connectivity with centralized policy enforcement and traffic optimization.</p>
+
+                            <p>Implement comprehensive network monitoring using flow analysis (NetFlow, sFlow), intrusion detection systems (IDS/IPS), and network behavior analysis for anomaly detection. Deploy network access logs correlation with security incident and event management (SIEM) systems for threat detection and response.</p>
+
+                            <p>Design remote access security using clientless VPN for web applications, SSL VPN for application access, and zero-trust network access (ZTNA) solutions for granular application access control. Implement device certificate authentication and conditional access based on device compliance and geographic location.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Network security controls vs performance and latency impact. Micro-segmentation granularity vs management complexity. Remote access security vs user experience and productivity.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle network security for containerized applications and service mesh architectures?</li>
+                                <li>What's your strategy for network security monitoring and threat detection in encrypted traffic?</li>
+                                <li>How do you implement network security for IoT devices and edge computing scenarios?</li>
+                                <li>What's your approach for network security incident response and forensic analysis?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure network security controls scale with organizational growth and cloud adoption?</li>
+                                <li>What strategies prevent network security from becoming a bottleneck for business operations?</li>
+                                <li>How do you validate network security effectiveness and detect bypass attempts?</li>
+                                <li>What's your approach for network security compliance and regulatory requirements?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of zero-trust principles and show knowledge of balancing security controls with network performance and user experience.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="vulnerability-management">
+                <h2>Vulnerability Management</h2>
+                
+                <div class="question">
+                    <h3>Q8: Design a vulnerability management program for a large-scale software platform with automated scanning, risk assessment, and remediation tracking across development and production environments.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement comprehensive vulnerability management with automated scanning in CI/CD pipelines, risk-based prioritization, coordinated disclosure processes, and metrics-driven remediation tracking.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy automated vulnerability scanning integrated into CI/CD pipelines using SAST (static analysis), DAST (dynamic analysis), SCA (software composition analysis), and container image scanning. Configure scanning gates that prevent deployment of high-severity vulnerabilities while allowing controlled deployment of lower-risk issues with tracking.</p>
+
+                            <p>Implement risk-based vulnerability prioritization using CVSS scoring, exploit availability, asset criticality, and exposure assessment. Create vulnerability SLAs based on severity: critical vulnerabilities (24-48 hours), high (1 week), medium (1 month), and low (quarterly). Use threat intelligence integration to prioritize vulnerabilities with active exploitation.</p>
+
+                            <p>Design coordinated vulnerability disclosure processes for security researchers including bug bounty programs, responsible disclosure timelines, and communication protocols. Implement vulnerability triage processes with security team review, impact assessment, and remediation planning coordination with development teams.</p>
+
+                            <p>Create comprehensive vulnerability tracking and metrics including mean time to detection (MTTD), mean time to remediation (MTTR), vulnerability density trends, and remediation compliance rates. Implement executive reporting dashboards showing security posture trends and compliance with remediation SLAs.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Scanning frequency and depth vs CI/CD pipeline performance. Vulnerability remediation speed vs thorough testing and validation. Automated vs manual vulnerability assessment accuracy.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle vulnerability management for third-party dependencies and open-source components?</li>
+                                <li>What's your strategy for vulnerability management in microservices architectures with hundreds of services?</li>
+                                <li>How do you implement vulnerability management for legacy systems without modern scanning capabilities?</li>
+                                <li>What's your approach for vulnerability management during incident response and active exploitation?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure vulnerability management processes don't impede development velocity?</li>
+                                <li>What strategies prevent vulnerability management from creating alert fatigue and process overhead?</li>
+                                <li>How do you validate vulnerability management effectiveness and program maturity?</li>
+                                <li>What's your approach for vulnerability management cost optimization and tool consolidation?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of vulnerability management as a continuous process and demonstrate knowledge of balancing security with development productivity.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="privacy-data-protection">
+                <h2>Privacy & Data Protection</h2>
+                
+                <div class="question">
+                    <h3>Q9: Design privacy and data protection architecture for a global consumer platform complying with GDPR, CCPA, and other regional privacy regulations while maintaining functionality and user experience.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement privacy-by-design architecture with data minimization, consent management, data subject rights automation, and cross-border data transfer compliance mechanisms.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement privacy-by-design architecture with data classification, retention policies, and purpose limitation enforcement. Deploy data discovery tools to identify and catalog personal data across systems, implement automated data lifecycle management with configurable retention periods, and design data minimization strategies to collect and process only necessary data.</p>
+
+                            <p>Design comprehensive consent management system with granular consent collection, preference centers for users to manage consent, and consent propagation across all data processing systems. Implement consent validation for marketing, analytics, and personalization with clear opt-out mechanisms and consent withdrawal processing.</p>
+
+                            <p>Create automated data subject rights fulfillment for GDPR Article 15-22 rights: data access requests with automated data compilation, data portability with standardized export formats, data rectification workflows, and right to erasure with comprehensive data deletion across distributed systems including backups and logs.</p>
+
+                            <p>Deploy cross-border data transfer mechanisms using Standard Contractual Clauses (SCCs), adequacy decisions, and data localization where required. Implement data residency enforcement with geographic data routing, encryption for data in transit across regions, and compliance monitoring for international data transfers.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Privacy controls vs personalization and analytics capabilities. Data localization vs global system efficiency. Automated compliance vs manual review accuracy.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle privacy compliance for real-time data processing and machine learning systems?</li>
+                                <li>What's your strategy for privacy compliance in data sharing partnerships and third-party integrations?</li>
+                                <li>How do you implement privacy controls for anonymous and pseudonymous data processing?</li>
+                                <li>What's your approach for privacy impact assessments and compliance monitoring automation?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure privacy compliance doesn't significantly impact system performance and user experience?</li>
+                                <li>What strategies prevent privacy controls from creating operational overhead and complexity?</li>
+                                <li>How do you validate privacy compliance effectiveness and detect compliance gaps?</li>
+                                <li>What's your approach for privacy compliance cost management and ROI measurement?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of privacy as both legal and technical challenge, and show knowledge of implementing privacy controls without compromising business functionality.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="security-monitoring">
+                <h2>Security Monitoring</h2>
+                
+                <div class="question">
+                    <h3>Q10: Design security monitoring and threat detection system for a distributed platform with real-time analysis, behavioral analytics, and automated incident response capabilities.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement comprehensive security monitoring with SIEM integration, user and entity behavior analytics (UEBA), threat intelligence feeds, and automated response playbooks for rapid threat containment.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy Security Information and Event Management (SIEM) system with log aggregation from all security-relevant sources: application logs, system logs, network flows, authentication events, and cloud service logs. Implement real-time correlation rules for known attack patterns and compliance monitoring with automated alerting and escalation procedures.</p>
+
+                            <p>Implement User and Entity Behavior Analytics (UEBA) with machine learning models to establish baseline behavior patterns and detect anomalies: unusual login locations, abnormal data access patterns, privilege escalation attempts, and lateral movement indicators. Use statistical analysis and risk scoring to prioritize security alerts.</p>
+
+                            <p>Integrate threat intelligence feeds from commercial providers, open source intelligence (OSINT), and government sources to enrich security alerts with contextual information about attackers, techniques, and indicators of compromise (IOCs). Implement automated threat hunting based on intelligence updates and emerging attack patterns.</p>
+
+                            <p>Design automated incident response with playbooks for common security scenarios: account lockdown for compromised credentials, network isolation for infected systems, and evidence preservation for forensic analysis. Implement Security Orchestration, Automation and Response (SOAR) capabilities for coordinated response across security tools.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Security monitoring depth vs data processing costs and storage requirements. Alert sensitivity vs false positive noise and analyst fatigue. Automated response speed vs risk of incorrect automated actions.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle security monitoring for encrypted traffic and zero-trust network architectures?</li>
+                                <li>What's your strategy for security monitoring across multi-cloud and hybrid environments?</li>
+                                <li>How do you implement security monitoring for containerized applications and serverless functions?</li>
+                                <li>What's your approach for security monitoring during incident response and active attack scenarios?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure security monitoring scales with organizational growth and data volume?</li>
+                                <li>What strategies prevent security monitoring from overwhelming security operations teams?</li>
+                                <li>How do you validate security monitoring effectiveness and detect blind spots?</li>
+                                <li>What's your approach for security monitoring cost optimization and tool consolidation?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of security monitoring as both detective and preventive control, and demonstrate knowledge of balancing comprehensive monitoring with operational efficiency.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="incident-response">
+                <h2>Incident Response</h2>
+                
+                <div class="question">
+                    <h3>Q11: Design security incident response program for a financial services organization with regulatory reporting requirements, forensic capabilities, and business continuity considerations.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement comprehensive incident response with automated detection and triage, coordinated response procedures, forensic investigation capabilities, and regulatory compliance reporting mechanisms.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy automated incident detection and classification using security monitoring tools with playbook-driven response escalation. Implement incident severity classification based on data sensitivity, system criticality, and potential business impact with appropriate response timelines: critical (15 minutes), high (1 hour), medium (4 hours), low (24 hours).</p>
+
+                            <p>Design incident response team structure with defined roles: incident commander for coordination, technical leads for investigation and containment, communications lead for stakeholder updates, and legal/compliance leads for regulatory requirements. Implement 24/7 on-call rotation with escalation procedures and external expert engagement capabilities.</p>
+
+                            <p>Implement forensic investigation capabilities with evidence preservation, chain of custody procedures, and digital forensics tools for malware analysis, memory dumps, and network traffic analysis. Deploy isolated forensic environments for malware analysis and evidence processing without contaminating production systems.</p>
+
+                            <p>Create regulatory compliance reporting workflows for mandatory breach notifications: customer notification procedures (GDPR 72-hour rule), regulatory reporting (SEC, banking regulators), and law enforcement coordination when required. Implement automated report generation with legal review processes and approved communication templates.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Response speed vs thorough investigation and evidence preservation. Incident containment vs forensic evidence integrity. Automated response vs human oversight and decision-making.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle incident response for supply chain attacks and third-party vendor compromises?</li>
+                                <li>What's your strategy for incident response during major business events and high-availability requirements?</li>
+                                <li>How do you implement incident response for cloud-native and distributed architectures?</li>
+                                <li>What's your approach for incident response coordination with external law enforcement and partners?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure incident response capabilities remain effective during large-scale attacks?</li>
+                                <li>What strategies prevent incident response from creating business disruption beyond the original incident?</li>
+                                <li>How do you validate incident response preparedness and team readiness?</li>
+                                <li>What's your approach for incident response program improvement and lessons learned integration?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of incident response as both technical and business process, and show knowledge of regulatory requirements in different industries.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="compliance-frameworks">
+                <h2>Compliance Frameworks</h2>
+                
+                <div class="question">
+                    <h3>Q12: Design compliance architecture for a multi-national organization requiring SOC 2, ISO 27001, PCI DSS, and GDPR compliance with automated controls and continuous monitoring.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement unified compliance management with automated control implementation, continuous monitoring, evidence collection, and audit preparation across multiple regulatory frameworks and jurisdictions.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy unified compliance management platform with control mapping across multiple frameworks to identify overlapping requirements and optimize implementation efforts. Implement Governance, Risk, and Compliance (GRC) tools for control documentation, risk assessment, and audit trail management with automated workflow approvals and exception tracking.</p>
+
+                            <p>Design automated compliance monitoring with continuous control testing: access control reviews, vulnerability scanning compliance, backup verification, and configuration compliance checks. Implement compliance dashboards showing real-time compliance posture, control effectiveness metrics, and remediation tracking with executive-level reporting.</p>
+
+                            <p>Create comprehensive evidence collection automation with policy enforcement monitoring, security awareness training tracking, and vendor risk assessment workflows. Implement document management systems with version control, approval workflows, and automated policy distribution with acknowledgment tracking.</p>
+
+                            <p>Deploy audit preparation automation with evidence compilation, control testing documentation, and audit response coordination. Implement third-party risk management with vendor security assessments, contract compliance monitoring, and supply chain risk evaluation integrated with compliance requirements.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Compliance automation vs manual review accuracy and flexibility. Multiple framework alignment vs framework-specific optimization. Continuous monitoring overhead vs audit readiness and risk reduction.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle compliance requirements for emerging technologies like AI/ML and blockchain?</li>
+                                <li>What's your strategy for compliance management across different business units and geographic regions?</li>
+                                <li>How do you implement compliance for cloud services and third-party integrations?</li>
+                                <li>What's your approach for compliance framework updates and regulatory changes management?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure compliance programs scale with business growth and complexity?</li>
+                                <li>What strategies prevent compliance requirements from impeding business agility and innovation?</li>
+                                <li>How do you validate compliance program effectiveness and maturity measurement?</li>
+                                <li>What's your approach for compliance cost optimization and ROI demonstration?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of compliance as business enabler rather than just overhead, and demonstrate knowledge of aligning multiple compliance requirements efficiently.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="study-guide">
+                <h2>How to Use This Study Guide</h2>
+                
+                <h3>Study Approach</h3>
+                <ul>
+                    <li>Study major compliance frameworks (SOX, HIPAA, PCI DSS, GDPR) and their technical requirements</li>
+                    <li>Practice implementing authentication and authorization systems using industry-standard tools</li>
+                    <li>Work through security threat modeling exercises for distributed systems</li>
+                    <li>Understand cryptographic principles and key management best practices</li>
+                </ul>
+
+                <h3>Mock Interview Pacing</h3>
+                <ul>
+                    <li>Identify security and compliance requirements (5 minutes)</li>
+                    <li>Design security architecture and controls (15 minutes)</li>
+                    <li>Discuss threat mitigation and monitoring strategies (10 minutes)</li>
+                    <li>Address compliance and audit considerations (10 minutes)</li>
+                </ul>
+
+                <h3>Hands-on Practice</h3>
+                <p>Implement OAuth2/OIDC flows, set up secret management systems, practice encryption key management, and work through compliance audit scenarios using real security tools and frameworks.</p>
+            </div>
+        </main>
+
+        <a href="#" class="back-to-top">↑</a>
+    </div>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        window.addEventListener('scroll', function() {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+
+        document.querySelector('.back-to-top').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

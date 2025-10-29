@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event-Driven Architecture & Kafka - Principal/Staff Engineer Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Event-Driven Architecture & Kafka for Principal/Staff Engineers</h1>
+            <div class="subtitle">Master event streaming, Kafka internals, and event-driven patterns for building scalable, resilient distributed systems with strong consistency and ordering guarantees.</div>
+        </header>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="01-system-design.html">System Design</a></li>
+                <li><a href="02-distributed-systems.html">Distributed Systems</a></li>
+                <li><a href="03-databases-storage.html">Databases & Storage</a></li>
+                <li><a href="04-performance-jvm.html">Performance & JVM</a></li>
+                <li><a href="05-event-driven-kafka.html" class="active">Event-Driven & Kafka</a></li>
+                <li><a href="06-observability-monitoring.html">Observability</a></li>
+                <li><a href="07-security-compliance.html">Security & Compliance</a></li>
+                <li><a href="08-leadership-tradeoffs.html">Leadership & Trade-offs</a></li>
+                <li><a href="09-testing-cicd.html">Testing & CI/CD</a></li>
+                <li><a href="10-algorithms-datastructures.html">Algorithms & Data Structures</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <div class="toc">
+                <h2>Table of Contents</h2>
+                <ol>
+                    <li><a href="#kafka-architecture-internals">Kafka Architecture & Internals</a></li>
+                    <li><a href="#partitioning-strategies">Partitioning Strategies</a></li>
+                    <li><a href="#consumer-groups-scaling">Consumer Groups & Scaling</a></li>
+                    <li><a href="#ordering-guarantees">Ordering Guarantees</a></li>
+                    <li><a href="#retention-storage">Retention & Storage</a></li>
+                    <li><a href="#kafka-streams-vs-ksql">Kafka Streams vs KSQL</a></li>
+                    <li><a href="#idempotency-exactly-once">Idempotency & Exactly-Once</a></li>
+                    <li><a href="#schema-evolution">Schema Evolution</a></li>
+                    <li><a href="#event-sourcing-patterns">Event Sourcing Patterns</a></li>
+                    <li><a href="#monitoring-operations">Monitoring & Operations</a></li>
+                    <li><a href="#multi-region-setup">Multi-Region Setup</a></li>
+                    <li><a href="#performance-optimization">Performance Optimization</a></li>
+                </ol>
+            </div>
+
+            <section id="kafka-architecture-internals">
+                <h2>Kafka Architecture & Internals</h2>
+                
+                <div class="question">
+                    <h3>Q1: Design a Kafka cluster architecture for a financial services platform processing 1M transactions/day with strict ordering, durability, and compliance requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement multi-broker Kafka cluster with appropriate replication, ISR management, and durability settings to ensure transaction ordering, prevent data loss, and meet financial regulatory compliance requirements.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design a 5-broker Kafka cluster across 3 availability zones (2-2-1 distribution) with replication factor 3 and min.insync.replicas=2 to ensure durability without single points of failure. For 1M transactions/day (~12 TPS average, ~120 TPS peak), configure appropriate partition counts based on consumer parallelism requirements and expected growth.</p>
+
+                            <p>Configure producer settings for maximum durability: <code>acks=all</code>, <code>retries=Integer.MAX_VALUE</code>, <code>enable.idempotence=true</code> to prevent duplicate messages. Set <code>max.in.flight.requests.per.connection=1</code> to maintain strict ordering within partitions. Use synchronous sends for critical financial transactions despite performance impact.</p>
+
+                            <p>Implement log segment configuration for compliance: <code>log.retention.hours=175200</code> (20 years), <code>log.segment.bytes=1GB</code>, <code>log.cleanup.policy=compact,delete</code> for audit trails. Configure <code>unclean.leader.election.enable=false</code> to prevent data loss during leader elections, accepting availability trade-offs for consistency.</p>
+
+                            <p>Deploy comprehensive monitoring covering broker metrics (request rates, log lag, ISR shrinkage), producer metrics (batch sizes, compression ratios, retry counts), and cluster health (under-replicated partitions, offline partitions, controller election frequency).</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Higher latency (50-100ms) vs durability guarantees. Storage costs for long retention vs regulatory compliance. Availability reduction vs consistency requirements during network partitions.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle Kafka cluster upgrades without downtime for critical financial transactions?</li>
+                                <li>What's your strategy for partition rebalancing during broker failures in peak trading hours?</li>
+                                <li>How do you ensure transaction ordering across multiple related topics?</li>
+                                <li>How do you implement end-to-end transaction traceability across the event pipeline?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>What monitoring alerts prevent compliance violations during Kafka operations?</li>
+                                <li>How do you validate Kafka configuration changes don't compromise durability guarantees?</li>
+                                <li>What's your disaster recovery strategy for complete Kafka cluster failure?</li>
+                                <li>How do you ensure Kafka performance meets SLA requirements during regulatory audits?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize understanding of financial industry requirements and regulatory compliance implications.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="partitioning-strategies">
+                <h2>Partitioning Strategies</h2>
+                
+                <div class="question">
+                    <h3>Q2: Design a partitioning strategy for an e-commerce platform where you need to maintain order processing sequence per customer while maximizing parallel processing capabilities.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Use customer-based partitioning with consistent hashing, implement partition affinity for related events, and design consumer scaling strategies to balance ordering guarantees with processing parallelism.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement customer-based partitioning using customer_id as the partition key with murmur3 hash algorithm for even distribution. This ensures all events for a specific customer land in the same partition, maintaining per-customer ordering while enabling parallel processing across different customers.</p>
+
+                            <p>Calculate partition count based on expected consumer parallelism and growth projections. For 100K active customers with average 5 orders/day, plan for 32-64 partitions supporting 32-64 concurrent consumers. Use consistent hashing to minimize rebalancing impact when adding partitions.</p>
+
+                            <p>Handle related events (order created, payment processed, shipment initiated) by using composite keys: <code>customer_id#order_id</code> to maintain strict ordering within order lifecycle while distributing different orders across partitions. Implement partition affinity for session-based events using session_id prefixes.</p>
+
+                            <p>Design consumer scaling strategies with partition assignment awareness: implement custom partition assignors for sticky assignment, use consumer group coordination for graceful rebalancing, and implement backpressure handling when consumers cannot keep up with production rates.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Partition hotspots with uneven customer activity vs strict ordering guarantees. Limited parallelism per customer vs system-wide scalability. Partition count optimization complexity vs future scaling flexibility.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle partition hotspots during flash sales or celebrity customer activity?</li>
+                                <li>What's your approach for rebalancing partitions when adding new consumer instances?</li>
+                                <li>How do you maintain ordering when implementing retry logic for failed message processing?</li>
+                                <li>How do you handle customer data migration between partitions during system scaling?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you monitor partition distribution effectiveness across the customer base?</li>
+                                <li>What strategies prevent partition skew from impacting overall system performance?</li>
+                                <li>How do you validate partitioning changes maintain ordering guarantees?</li>
+                                <li>What's your approach for capacity planning based on partition utilization metrics?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of business requirements driving partitioning decisions and operational impact.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="idempotency-exactly-once">
+                <h2>Idempotency & Exactly-Once</h2>
+                
+                <div class="question">
+                    <h3>Q3: Design exactly-once message processing in a distributed stream processing system handling financial transactions.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Combine idempotent operations, message deduplication, and transactional outbox patterns to achieve exactly-once processing semantics for critical financial data.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement exactly-once semantics using three complementary mechanisms: producer idempotency, consumer deduplication, and transactional processing. Producers include unique message IDs and use idempotent retry logic. Kafka's exactly-once semantics (EOS) provides producer-level guarantees through sequence numbers and producer epochs.</p>
+
+                            <p>For consumers, implement deduplication using distributed cache (Redis) storing processed message IDs with appropriate TTL. Use consistent hashing to distribute deduplication state across cache nodes for scalability. For database operations, use upsert operations with business keys rather than generated IDs to ensure idempotency.</p>
+
+                            <p>Deploy transactional outbox pattern: write business state changes and outgoing messages within the same database transaction, then asynchronously publish messages using change data capture. This ensures atomicity between state changes and message publishing, preventing dual-write problems.</p>
+
+                            <p>For stream processing, use Kafka Streams' exactly-once processing with transaction boundaries spanning multiple topic partitions. Configure appropriate commit intervals balancing latency and duplicate processing risk during rebalancing.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Performance overhead (10-20%) vs correctness guarantees. Storage overhead for deduplication state vs duplicate message prevention. Increased complexity vs business requirement compliance.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle exactly-once semantics during consumer group rebalancing?</li>
+                                <li>What's your strategy for TTL management in deduplication caches?</li>
+                                <li>How do you implement exactly-once processing across multiple Kafka clusters?</li>
+                                <li>How do you handle idempotency for operations that span multiple database transactions?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you monitor exactly-once processing effectiveness in production systems?</li>
+                                <li>What strategies ensure exactly-once implementations don't introduce performance bottlenecks?</li>
+                                <li>How do you validate exactly-once behavior during disaster recovery scenarios?</li>
+                                <li>What's your testing approach for exactly-once semantics under various failure conditions?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize the business criticality of exactly-once processing in financial systems and regulatory implications.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="schema-evolution">
+                <h2>Schema Evolution</h2>
+                
+                <div class="question">
+                    <h3>Q4: Implement schema evolution strategy for a high-throughput event streaming platform with multiple consumer teams having different upgrade schedules.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Use schema registry with backward/forward compatibility rules, implement gradual rollout strategies, and design consumer resilience patterns to handle schema changes without service disruption.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy Confluent Schema Registry or equivalent with strict compatibility policies: backward compatibility for consumer upgrades, forward compatibility for producer upgrades, and full compatibility for bidirectional evolution. Use Avro or Protocol Buffers for rich schema evolution support with default values and optional fields.</p>
+
+                            <p>Implement schema versioning strategy with semantic versioning: major versions for breaking changes, minor versions for backward-compatible additions, patch versions for documentation updates. Design producer code to publish schema versions explicitly and consumer code to handle multiple schema versions gracefully.</p>
+
+                            <p>Design gradual rollout process: deploy new schema versions to staging environments, validate consumer compatibility using shadow traffic, rollout producers with new schemas using feature flags, then upgrade consumers at their own pace. Use canary deployments for schema changes with automatic rollback on compatibility failures.</p>
+
+                            <p>Implement consumer resilience patterns: ignore unknown fields for forward compatibility, provide default values for missing fields for backward compatibility, and use schema evolution testing frameworks to validate compatibility matrices across service versions.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Schema evolution flexibility vs system complexity. Deployment coordination overhead vs service autonomy. Schema validation performance vs compatibility guarantees.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle schema evolution for events that require strict ordering guarantees?</li>
+                                <li>What's your strategy for deprecating old schema versions without breaking existing consumers?</li>
+                                <li>How do you implement schema evolution for complex nested data structures?</li>
+                                <li>How do you handle schema changes that affect business logic in downstream consumers?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure schema evolution doesn't violate data governance policies?</li>
+                                <li>What monitoring detects schema compatibility issues before they impact consumers?</li>
+                                <li>How do you validate schema evolution changes across all consuming applications?</li>
+                                <li>What's your approach for schema evolution documentation and team coordination?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of schema evolution impact on system architecture and team coordination challenges.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="kafka-streams-vs-ksql">
+                <h2>Kafka Streams vs KSQL</h2>
+                
+                <div class="question">
+                    <h3>Q5: Compare Kafka Streams and ksqlDB for implementing real-time analytics on user behavior data requiring complex aggregations, joins, and windowing operations.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Kafka Streams provides programmatic flexibility and performance optimization for complex logic, while ksqlDB offers SQL-based simplicity for standard operations. Choose based on complexity requirements, team skills, and operational preferences.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Kafka Streams excels for complex business logic requiring custom processors, state store optimization, and fine-grained control over processing topology. It provides type safety, IDE support, and integration with existing Java ecosystems. Custom serializers, processors, and transformers enable optimization for specific use cases.</p>
+
+                            <p>ksqlDB simplifies development for standard analytical operations using familiar SQL syntax. It provides built-in connectors, automatic scaling, and operational tooling. Push/pull queries enable both streaming and interactive analytics. Schema Registry integration provides automatic schema evolution and type safety.</p>
+
+                            <p>For complex aggregations, Kafka Streams offers custom aggregation functions, multiple state stores, and optimization opportunities through processor API. ksqlDB provides standard SQL aggregations (SUM, COUNT, AVG) with windowing but limited customization for complex business logic.</p>
+
+                            <p>Performance considerations: Kafka Streams allows fine-tuning through custom state stores, memory management, and processing optimization. ksqlDB abstracts these details but may have overhead for simple operations. Kafka Streams provides better control over resource utilization and scaling patterns.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Development speed (ksqlDB faster) vs customization flexibility (Kafka Streams). SQL familiarity vs programming language expertise requirements. Operational simplicity vs performance optimization opportunities.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you implement custom business logic that's not expressible in standard SQL?</li>
+                                <li>What's your strategy for migrating from ksqlDB to Kafka Streams for performance optimization?</li>
+                                <li>How do you handle schema evolution in complex multi-stream join operations?</li>
+                                <li>How do you implement exactly-once processing guarantees in both Kafka Streams and ksqlDB?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you monitor and debug performance issues in ksqlDB vs Kafka Streams applications?</li>
+                                <li>What testing strategies ensure correctness of complex stream processing logic?</li>
+                                <li>How do you handle operational deployment and scaling for both technologies?</li>
+                                <li>What factors drive the decision between SQL-based and programmatic stream processing?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of when to choose each technology based on specific requirements and team capabilities.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="consumer-groups-scaling">
+                <h2>Consumer Groups & Scaling</h2>
+                
+                <div class="question">
+                    <h3>Q6: Design a consumer scaling strategy for processing user activity events where consumption rate varies 10x between peak and off-peak hours.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement dynamic consumer group scaling with auto-scaling based on lag metrics, design partition assignment strategies for load balancing, and handle rebalancing scenarios to minimize processing disruption.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement auto-scaling consumer groups based on consumer lag metrics. Monitor per-partition lag and trigger scaling when lag exceeds thresholds (e.g., >10,000 messages or >5 minutes behind). Use Kubernetes HPA with custom metrics or AWS Auto Scaling based on CloudWatch metrics to dynamically adjust consumer instance counts from 2 instances off-peak to 20 instances during peak hours.</p>
+
+                            <p>Design partition assignment strategies using cooperative rebalancing (incremental cooperative rebalancing protocol) to minimize stop-the-world rebalancing. Configure <code>partition.assignment.strategy=CooperativeStickyAssignor</code> to maintain partition ownership during scaling events. Set appropriate <code>session.timeout.ms=30000</code> and <code>heartbeat.interval.ms=3000</code> to detect failed consumers quickly while avoiding false positives.</p>
+
+                            <p>Optimize consumer configuration for scaling scenarios: use <code>max.poll.records</code> based on processing time per message to prevent rebalancing due to slow processing. Implement graceful shutdown with proper cleanup and offset commits. Design consumer state management to handle partition reassignment without data loss or duplicate processing.</p>
+
+                            <p>Handle scaling challenges: implement consumer warm-up strategies for new instances, use sticky partitioning to maintain local caches across rebalancing, and design consumer lag monitoring with predictive scaling based on traffic patterns and seasonal variations to proactively scale before lag accumulates.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Auto-scaling responsiveness vs infrastructure costs (10x cost variation). Rebalancing frequency vs partition stickiness. Consumer instance startup time vs scaling agility.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle consumer scaling when processing requires maintaining local state or caches?</li>
+                                <li>What's your strategy for consumer scaling during planned maintenance or rolling deployments?</li>
+                                <li>How do you implement consumer scaling for stateful stream processing applications?</li>
+                                <li>What's your approach for handling consumer scaling in multi-tenant environments?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure consumer scaling doesn't impact overall system performance during traffic spikes?</li>
+                                <li>What strategies prevent consumer scaling from creating processing bottlenecks downstream?</li>
+                                <li>How do you validate consumer scaling effectiveness and detect scaling oscillations?</li>
+                                <li>What's your approach for consumer scaling cost optimization while maintaining SLA compliance?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of Kafka's consumer group mechanics and demonstrate knowledge of scaling trade-offs in event-driven architectures.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ordering-guarantees">
+                <h2>Ordering Guarantees</h2>
+                
+                <div class="question">
+                    <h3>Q7: Design ordering guarantees for an e-commerce order processing system where order state changes must be processed in sequence per customer.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement partition-level ordering using customer ID as partition key, design idempotent processing for duplicate handling, and create ordering validation mechanisms to ensure business logic correctness.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement partition-level ordering by using customer ID as partition key to ensure all events for a specific customer land in the same partition and maintain order. Configure producers with <code>max.in.flight.requests.per.connection=1</code> and <code>enable.idempotence=true</code> to prevent reordering during retries. Use monotonic sequence numbers per customer to validate event ordering during processing.</p>
+
+                            <p>Design consumer processing with single-threaded consumption per partition to maintain ordering guarantees. Implement record-level sequence validation and handle out-of-order scenarios with buffering and reordering logic. Use database transactions or saga patterns to ensure atomic processing of ordered events while maintaining consistency across microservices.</p>
+
+                            <p>Handle ordering challenges during failures: implement replay mechanisms from specific offsets while maintaining order, design compensation logic for failed transactions in the middle of event sequences, and use event versioning to handle schema evolution without breaking ordering assumptions.</p>
+
+                            <p>Deploy monitoring for ordering violations: track sequence gaps, duplicate detection, and processing delays that might indicate ordering issues. Implement business-level ordering validation (order state transitions) in addition to technical sequence validation to catch ordering violations that impact business logic.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Ordering guarantees vs consumer parallelization opportunities. Single-threaded processing vs throughput scalability. Strict ordering vs fault tolerance and availability.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle ordering requirements when events span multiple partitions or topics?</li>
+                                <li>What's your strategy for maintaining ordering during Kafka cluster rebalancing or failures?</li>
+                                <li>How do you implement partial ordering where only some events need strict sequencing?</li>
+                                <li>What's your approach for ordering guarantees in multi-region Kafka deployments?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure ordering guarantees don't significantly impact system throughput?</li>
+                                <li>What strategies prevent ordering requirements from creating processing bottlenecks?</li>
+                                <li>How do you validate ordering correctness in production without impacting performance?</li>
+                                <li>What's your approach for ordering guarantee monitoring and alerting?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding that Kafka provides ordering only within partitions and show knowledge of trade-offs between ordering and scalability.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="retention-storage">
+                <h2>Retention & Storage</h2>
+                
+                <div class="question">
+                    <h3>Q8: Design a retention and storage strategy for a multi-tenant logging platform handling 100TB/day with different retention requirements per tenant.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement tiered storage with lifecycle management, design tenant-specific retention policies using topic-level configurations, and optimize storage costs through compression and archival strategies while maintaining query performance.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement Kafka tiered storage using remote storage tiers (S3, GCS) for cost optimization. Configure <code>remote.log.storage.system.enable=true</code> with local retention of 7 days for hot data and remote retention up to 7 years for compliance. Use topic-level retention settings per tenant: <code>retention.ms</code> and <code>retention.bytes</code> configured based on tenant SLA requirements.</p>
+
+                            <p>Deploy compression optimization using producer-level compression (<code>compression.type=snappy</code> for speed, <code>lz4</code> for balance, <code>gzip</code> for maximum compression). Achieve 5-10x compression ratios for text logs. Implement log compaction for key-based data using <code>cleanup.policy=compact</code> to maintain only latest values while reducing storage overhead.</p>
+
+                            <p>Design storage lifecycle management with automated archival processes. Configure segment rolling based on size (<code>segment.bytes=1GB</code>) and time (<code>segment.ms=1week</code>) to optimize for both storage efficiency and query performance. Implement cross-region replication for disaster recovery with appropriate retention alignment.</p>
+
+                            <p>Optimize for multi-tenancy using topic naming strategies (tenant-service-environment pattern), implement storage quota monitoring per tenant, and use Kafka Quotas to prevent single tenants from overwhelming cluster storage. Deploy monitoring for storage growth rates, retention policy compliance, and archival process health.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Storage costs (70-80% reduction with tiered storage) vs query latency for archived data. Compression CPU overhead vs network and storage savings. Local retention vs disaster recovery capabilities.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle retention policy changes for existing topics with large amounts of data?</li>
+                                <li>What's your strategy for data lifecycle management across different compliance requirements?</li>
+                                <li>How do you implement point-in-time recovery with tiered storage architectures?</li>
+                                <li>What's your approach for retention policy validation and preventing accidental data loss?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure retention and storage strategies meet cost optimization targets?</li>
+                                <li>What strategies prevent storage management from impacting Kafka cluster performance?</li>
+                                <li>How do you validate storage lifecycle processes and detect archival failures?</li>
+                                <li>What's your approach for storage capacity planning and growth forecasting?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of Kafka storage economics and demonstrate knowledge of balancing cost, performance, and compliance requirements.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="event-sourcing-patterns">
+                <h2>Event Sourcing Patterns</h2>
+                
+                <div class="question">
+                    <h3>Q9: Design an event sourcing architecture for a banking system requiring complete audit trails, temporal queries, and the ability to replay system state at any point in time.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement event sourcing with Kafka as event store, design snapshot mechanisms for performance, create projection rebuilding strategies, and ensure regulatory compliance with immutable audit trails.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design event sourcing using Kafka as the primary event store with append-only semantics. Structure events with proper versioning, correlation IDs, and cryptographic signatures for audit compliance. Use aggregate root IDs as partition keys to maintain event ordering per business entity. Configure infinite retention (<code>retention.ms=-1</code>) for immutable audit trails with regulatory compliance.</p>
+
+                            <p>Implement efficient projection rebuilding using Kafka Streams or ksqlDB for materialized views. Create multiple projections optimized for different query patterns: real-time balance views, historical reporting aggregations, and compliance audit trails. Use state stores with changelog topics for fault-tolerant projection recovery and implement projection versioning for schema evolution.</p>
+
+                            <p>Design snapshot mechanisms to optimize replay performance for large event histories. Create periodic snapshots of aggregate state and store in separate Kafka topics with compaction. Implement snapshot validation using event replay to ensure consistency. Use snapshot + incremental events approach for temporal queries spanning long time periods.</p>
+
+                            <p>Handle event sourcing challenges: implement event upcasting for schema migration, design compensation events for business corrections, and create event archival strategies for long-term storage optimization. Deploy comprehensive monitoring for event processing lag, projection consistency, and replay performance metrics.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Complete audit capability vs storage and processing costs. Event replay flexibility vs system complexity. Immutable event history vs storage growth management.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle event sourcing for aggregates with complex business rules and invariants?</li>
+                                <li>What's your strategy for event sourcing schema evolution without breaking existing projections?</li>
+                                <li>How do you implement event sourcing across multiple bounded contexts and microservices?</li>
+                                <li>What's your approach for handling sensitive data in event sourcing with GDPR compliance?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure event sourcing performance scales with event volume growth?</li>
+                                <li>What strategies prevent event sourcing from creating system complexity that impacts maintainability?</li>
+                                <li>How do you validate event sourcing correctness and detect projection inconsistencies?</li>
+                                <li>What's your approach for event sourcing disaster recovery and cross-region replication?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of event sourcing benefits and challenges, and show knowledge of when event sourcing provides value vs traditional CRUD approaches.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="monitoring-operations">
+                <h2>Monitoring & Operations</h2>
+                
+                <div class="question">
+                    <h3>Q10: Design a comprehensive monitoring and alerting strategy for a production Kafka cluster serving critical business applications with strict SLA requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement multi-layer Kafka monitoring covering cluster health, performance metrics, and business KPIs with proactive alerting, automated remediation, and comprehensive observability for troubleshooting.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy comprehensive metric collection using JMX exporters for Kafka brokers, Prometheus for time-series storage, and Grafana for visualization. Monitor critical broker metrics: request rates and latencies, log flush rates, ISR shrink/expansion rates, and under-replicated partitions. Track producer metrics: batch sizes, compression ratios, retry rates, and error rates per topic.</p>
+
+                            <p>Implement proactive alerting with SLA-based thresholds: consumer lag exceeding business requirements (>5 minutes for critical topics), broker disk usage approaching limits (>80%), and ISR shrinkage indicating potential data loss risks. Use composite alerts combining multiple metrics to reduce false positives while ensuring critical issues are detected quickly.</p>
+
+                            <p>Design automated remediation for common issues: automatic partition reassignment for broker failures, consumer group rebalancing optimization, and log retention management for storage optimization. Implement circuit breakers and degraded mode operations to maintain system stability during partial failures.</p>
+
+                            <p>Deploy end-to-end observability using distributed tracing to correlate Kafka operations with application performance. Monitor business metrics: message processing success rates, data pipeline SLA compliance, and customer-facing feature availability. Implement log aggregation for troubleshooting and performance analysis across the entire Kafka ecosystem.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Monitoring overhead (3-5% performance impact) vs operational visibility. Alert sensitivity vs false positive noise. Automated remediation benefits vs risk of automated actions causing issues.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you monitor Kafka performance during rolling upgrades and maintenance windows?</li>
+                                <li>What's your strategy for monitoring Kafka in multi-cluster and multi-region deployments?</li>
+                                <li>How do you implement monitoring for Kafka Streams applications and stateful processing?</li>
+                                <li>What's your approach for monitoring Kafka security and detecting potential attacks?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure Kafka monitoring doesn't impact cluster performance during peak loads?</li>
+                                <li>What strategies prevent monitoring systems from becoming bottlenecks during incidents?</li>
+                                <li>How do you validate monitoring effectiveness and detect blind spots in observability?</li>
+                                <li>What's your approach for monitoring cost optimization while maintaining operational excellence?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of proactive vs reactive monitoring approaches and demonstrate knowledge of Kafka-specific operational challenges.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="multi-region-setup">
+                <h2>Multi-Region Setup</h2>
+                
+                <div class="question">
+                    <h3>Q11: Design a multi-region Kafka deployment for a global application requiring disaster recovery, data locality compliance, and active-active processing across regions.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement cross-region replication using MirrorMaker 2.0, design region-specific processing with global coordination, and create disaster recovery procedures with automated failover capabilities.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Deploy dedicated Kafka clusters per region with MirrorMaker 2.0 for cross-region replication. Configure active-active replication for critical topics with conflict resolution strategies. Use topic naming conventions (us-west.orders, eu-west.orders) to identify source regions and implement bi-directional replication with loop prevention using unique cluster identifiers.</p>
+
+                            <p>Design data locality compliance using region-specific topic routing based on user location or data classification. Implement GDPR compliance with EU data remaining in EU regions while maintaining global coordination for business processes. Use Kafka Connect for region-specific data integration while maintaining schema consistency across regions.</p>
+
+                            <p>Implement disaster recovery with automated failover capabilities. Configure consumer applications with region preference and automatic failover to backup regions during outages. Use external coordination services (Consul, etcd) for region health monitoring and failover decision making. Design data consistency validation across regions using checksums and reconciliation processes.</p>
+
+                            <p>Handle multi-region challenges: network latency optimization using async replication, conflict resolution for concurrent updates using timestamp-based or business-logic-based strategies, and operational complexity management with centralized monitoring and deployment automation across regions.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Multi-region infrastructure costs (2-3x) vs disaster recovery capabilities. Cross-region latency vs data locality requirements. Operational complexity vs global availability guarantees.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle schema registry synchronization across multiple regions?</li>
+                                <li>What's your strategy for handling partial region failures and split-brain scenarios?</li>
+                                <li>How do you implement global exactly-once semantics across multiple Kafka regions?</li>
+                                <li>What's your approach for multi-region Kafka Streams state store replication?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure multi-region setup meets compliance requirements across different jurisdictions?</li>
+                                <li>What strategies prevent multi-region complexity from impacting application development velocity?</li>
+                                <li>How do you validate multi-region disaster recovery procedures without impacting production?</li>
+                                <li>What's your approach for multi-region cost optimization while maintaining availability SLAs?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of multi-region trade-offs and show knowledge of global system coordination challenges.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="performance-optimization">
+                <h2>Performance Optimization</h2>
+                
+                <div class="question">
+                    <h3>Q12: Optimize Kafka performance for a high-throughput IoT data ingestion system processing 1M messages/second with sub-100ms end-to-end latency requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement producer and consumer optimization strategies, configure Kafka brokers for high-throughput scenarios, and design system architecture minimizing latency while maintaining durability and fault tolerance.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Optimize producer configuration for high throughput: increase <code>batch.size=65536</code> and <code>linger.ms=5</code> to improve batching efficiency, use <code>compression.type=lz4</code> for balance of speed and compression ratio, configure <code>buffer.memory=134217728</code> (128MB) for high-volume buffering. Set <code>acks=1</code> for latency-critical scenarios accepting slight durability trade-offs.</p>
+
+                            <p>Configure brokers for optimal performance: increase <code>num.network.threads=8</code> and <code>num.io.threads=16</code> based on hardware, optimize <code>socket.send.buffer.bytes</code> and <code>socket.receive.buffer.bytes</code> for network throughput. Use dedicated SSD storage with appropriate <code>log.flush.interval.ms</code> settings and configure <code>replica.fetch.max.bytes</code> for efficient replication.</p>
+
+                            <p>Implement consumer optimization with parallel processing: use appropriate <code>fetch.min.bytes</code> and <code>fetch.max.wait.ms</code> for batching, configure <code>max.poll.records</code> based on processing capacity, and implement multi-threaded processing with proper offset management. Design consumer scaling with optimal partition counts for parallelization.</p>
+
+                            <p>Deploy system-level optimizations: use page cache optimization with appropriate OS-level tuning, implement network optimization with jumbo frames and TCP tuning, and design partition strategies minimizing cross-broker communication. Monitor performance metrics continuously and implement automated tuning based on workload patterns.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Throughput optimization vs latency requirements. Batching efficiency vs real-time processing needs. Durability settings vs performance optimization (acks=1 vs acks=all).
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you optimize Kafka performance for mixed workloads with different latency requirements?</li>
+                                <li>What's your strategy for performance optimization during peak traffic periods?</li>
+                                <li>How do you implement performance optimization without compromising data integrity?</li>
+                                <li>What's your approach for performance tuning in containerized Kafka deployments?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure performance optimizations remain effective across Kafka version upgrades?</li>
+                                <li>What strategies prevent performance optimizations from creating stability issues?</li>
+                                <li>How do you validate performance optimization effectiveness in production environments?</li>
+                                <li>What's your approach for performance optimization cost-benefit analysis and ROI measurement?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of Kafka performance bottlenecks and demonstrate systematic approach to performance tuning with measurable outcomes.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="study-guide">
+                <h2>How to Use This Study Guide</h2>
+                
+                <h3>Study Approach</h3>
+                <ul>
+                    <li>Set up local Kafka clusters to experiment with different configurations</li>
+                    <li>Implement sample event-driven applications using both Kafka Streams and ksqlDB</li>
+                    <li>Practice designing partition strategies for different use cases</li>
+                    <li>Work through failure scenarios and recovery procedures</li>
+                </ul>
+
+                <h3>Mock Interview Pacing</h3>
+                <ul>
+                    <li>Define event flow requirements and constraints (5 minutes)</li>
+                    <li>Design Kafka architecture and partitioning strategy (15 minutes)</li>
+                    <li>Discuss consumer scaling and ordering guarantees (10 minutes)</li>
+                    <li>Address monitoring, operations, and failure handling (10 minutes)</li>
+                </ul>
+
+                <h3>Hands-on Labs</h3>
+                <p>Create event-driven microservices, implement different partitioning strategies, experiment with consumer group scaling, and practice debugging Kafka performance issues using monitoring tools.</p>
+            </div>
+        </main>
+
+        <a href="#" class="back-to-top">↑</a>
+    </div>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        window.addEventListener('scroll', function() {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+
+        document.querySelector('.back-to-top').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

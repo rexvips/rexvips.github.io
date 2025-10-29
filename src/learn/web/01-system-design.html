@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design - Principal/Staff Engineer Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>System Design for Principal/Staff Engineers</h1>
+            <div class="subtitle">Master large-scale distributed system architecture, design patterns, and trade-offs essential for senior engineering leadership roles.</div>
+        </header>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="01-system-design.html" class="active">System Design</a></li>
+                <li><a href="02-distributed-systems.html">Distributed Systems</a></li>
+                <li><a href="03-databases-storage.html">Databases & Storage</a></li>
+                <li><a href="04-performance-jvm.html">Performance & JVM</a></li>
+                <li><a href="05-event-driven-kafka.html">Event-Driven & Kafka</a></li>
+                <li><a href="06-observability-monitoring.html">Observability</a></li>
+                <li><a href="07-security-compliance.html">Security & Compliance</a></li>
+                <li><a href="08-leadership-tradeoffs.html">Leadership & Trade-offs</a></li>
+                <li><a href="09-testing-cicd.html">Testing & CI/CD</a></li>
+                <li><a href="10-algorithms-datastructures.html">Algorithms & Data Structures</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <div class="toc">
+                <h2>Table of Contents</h2>
+                <ol>
+                    <li><a href="#scalability-fundamentals">Scalability Fundamentals</a></li>
+                    <li><a href="#load-balancing-traffic-distribution">Load Balancing & Traffic Distribution</a></li>
+                    <li><a href="#data-partitioning-sharding">Data Partitioning & Sharding</a></li>
+                    <li><a href="#consistency-models-cap-theorem">Consistency Models & CAP Theorem</a></li>
+                    <li><a href="#multi-region-architecture">Multi-Region Architecture</a></li>
+                    <li><a href="#caching-strategies">Caching Strategies</a></li>
+                    <li><a href="#api-gateway-patterns">API Gateway Patterns</a></li>
+                    <li><a href="#microservices-decomposition">Microservices Decomposition</a></li>
+                    <li><a href="#event-driven-architecture">Event-Driven Architecture</a></li>
+                    <li><a href="#capacity-planning-scaling">Capacity Planning & Scaling</a></li>
+                    <li><a href="#disaster-recovery-failover">Disaster Recovery & Failover</a></li>
+                    <li><a href="#advanced-architecture-patterns">Advanced Architecture Patterns</a></li>
+                </ol>
+            </div>
+
+            <section id="scalability-fundamentals">
+                <h2>Scalability Fundamentals</h2>
+                
+                <div class="question">
+                    <h3>Q1: How do you design a system to handle 100K requests per second with strict latency requirements (p99 < 50ms)?</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design requires horizontal scaling with load balancing, caching layers, asynchronous processing, and careful resource allocation to maintain sub-50ms response times at scale.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Achieving 100K RPS with p99 < 50ms requires a multi-layered approach. First, implement horizontal scaling with load balancers distributing traffic across multiple application instances. Use connection pooling and keep-alive connections to minimize connection overhead. Deploy CDN for static content and implement multi-tier caching (L1: in-memory, L2: Redis cluster, L3: database query cache).</p>
+
+                            <p>For the application layer, use non-blocking I/O with reactive programming models (WebFlux, Vert.x) or async frameworks. Implement circuit breakers to prevent cascade failures and use bulkheads to isolate critical resources. Database operations should leverage read replicas, connection pooling, and prepared statements. Consider database sharding if single-instance limits are reached.</p>
+
+                            <p>Monitor key metrics: request latency distribution, CPU/memory utilization, garbage collection pauses, and database connection pool usage. Implement proper request routing to ensure even load distribution. Use async processing for non-critical operations and implement graceful degradation for secondary features during peak load.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Higher infrastructure costs vs. performance guarantees. Complexity increases with caching layers (cache invalidation challenges). Eventual consistency models may be needed for global scale. Memory overhead from connection pools and caching.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How would you handle traffic spikes that exceed 150K RPS?</li>
+                                <li>What's your strategy for maintaining performance during database failover?</li>
+                                <li>How do you implement graceful degradation when downstream services are unavailable?</li>
+                                <li>What's your approach for handling geographic traffic distribution during regional outages?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate that your optimizations maintain security standards?</li>
+                                <li>What monitoring ensures SLA compliance during traffic spikes?</li>
+                                <li>How do you balance optimization costs vs performance benefits?</li>
+                                <li>What's your rollback strategy if performance optimizations cause stability issues?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of the full request lifecycle and show how each optimization addresses specific bottlenecks.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="load-balancing-traffic-distribution">
+                <h2>Load Balancing & Traffic Distribution</h2>
+                
+                <div class="question">
+                    <h3>Q2: Design a load balancing strategy for a microservices architecture with services having different resource requirements and SLA commitments.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement intelligent routing with service-aware load balancing, health checks, circuit breakers, and SLA-based traffic prioritization to optimize resource utilization across heterogeneous services.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design a multi-tier load balancing strategy starting with a global load balancer (GLB) for geographic distribution, followed by service-specific load balancers. Implement weighted round-robin with dynamic weight adjustment based on real-time metrics (CPU, memory, response time, active connections).</p>
+
+                            <p>For heterogeneous services, use resource-aware routing where compute-intensive services get routed to high-CPU instances, while I/O-bound services utilize instances with faster storage. Implement priority queues with SLA-based traffic classification: premium services get dedicated capacity and preferential routing during contention.</p>
+
+                            <p>Deploy health checks at multiple levels: TCP for basic connectivity, HTTP for application readiness, and custom health endpoints for business logic validation. Implement gradual traffic shifting for deployments using canary releases with automatic rollback on error rate thresholds.</p>
+
+                            <p>Use consistent hashing for stateful services to maintain session affinity while enabling horizontal scaling. Implement request-level metrics collection for traffic pattern analysis and predictive scaling decisions.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Increased complexity vs. optimized resource utilization. Additional latency from health checks vs. reliability. Memory overhead for connection tracking and metrics collection.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle load balancer failures in this architecture?</li>
+                                <li>What metrics drive your dynamic weight adjustment algorithm?</li>
+                                <li>How do you implement sticky sessions for stateful services in your load balancing strategy?</li>
+                                <li>What's your approach for routing traffic during service deployments?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure load balancing decisions maintain security isolation between tenant types?</li>
+                                <li>What monitoring validates that SLA-based routing actually improves business metrics?</li>
+                                <li>How do you test load balancing behavior under various failure scenarios?</li>
+                                <li>What's your strategy for load balancer configuration management across environments?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of service heterogeneity and business impact of different SLA tiers.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="data-partitioning-sharding">
+                <h2>Data Partitioning & Sharding</h2>
+                
+                <div class="question">
+                    <h3>Q3: Design a sharding strategy for a global e-commerce platform handling 1M orders per day with geographic distribution requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement hybrid sharding using geographic and hash-based partitioning with cross-shard query optimization, automatic rebalancing, and data locality principles for optimal performance.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design a two-level sharding strategy combining geographic and functional partitioning. Primary partition by region (US, EU, APAC) to ensure data locality and compliance with regional regulations. Within each region, implement hash-based sharding on user_id for user data and order_id for transactional data.</p>
+
+                            <p>For 1M orders/day (~12 orders/second average, ~120 orders/second peak), plan for 10x capacity (1200 orders/second). With 4KB average order size, daily storage is ~4GB. Plan for 1000x retention (10 years), requiring ~4TB per region. Implement consistent hashing with virtual nodes to enable seamless rebalancing.</p>
+
+                            <p>Handle cross-shard queries using federated query patterns or materialized views for common access patterns. Implement distributed transactions using saga patterns for order workflows spanning multiple shards. Use read replicas within each shard for analytics workloads.</p>
+
+                            <p>Deploy automatic rebalancing triggered by storage thresholds (80% capacity) or performance metrics (p95 latency > 100ms). Implement shadow traffic during rebalancing to validate new shard assignments before switching production traffic.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Query complexity increases for cross-shard operations. Rebalancing requires careful coordination. Hot spots possible with uneven geographic distribution. Additional infrastructure costs for distributed coordination.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle hotspots during flash sales in specific regions?</li>
+                                <li>What's your strategy for maintaining ACID properties across shards?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate capacity planning skills with concrete calculations and show awareness of operational complexity.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="consistency-models-cap-theorem">
+                <h2>Consistency Models & CAP Theorem</h2>
+                
+                <div class="question">
+                    <h3>Q4: Explain how you would implement eventual consistency for a global inventory management system while ensuring no overselling occurs.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Use strong consistency for inventory decrements with compensation patterns, eventual consistency for reads, and distributed locking with timeout-based cleanup to prevent overselling in a globally distributed system.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement a hybrid consistency model where inventory decrements require strong consistency while reads can be eventually consistent. Use distributed consensus (Raft/Multi-Paxos) for inventory write operations with a quorum-based approach requiring majority acknowledgment before confirming stock reduction.</p>
+
+                            <p>Design a reservation-based system where purchase attempts create temporary reservations with TTL (5-10 minutes). Reservations immediately decrement available inventory using strong consistency, while actual purchase completion uses saga patterns to either confirm or release reservations. This prevents overselling while allowing for shopping cart abandonment.</p>
+
+                            <p>For global distribution, implement master-slave replication per region with async replication for read queries. Use vector clocks or logical timestamps to handle concurrent updates. Implement conflict resolution using business rules (last-writer-wins for inventory increases, sum for concurrent decrements up to available stock).</p>
+
+                            <p>Deploy compensation mechanisms for failed transactions: if payment fails after inventory decrement, automatically trigger inventory restoration. Use event sourcing to maintain audit trails of all inventory operations for regulatory compliance and debugging.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Higher latency for write operations due to consensus requirements. Increased storage overhead for reservation tracking. Complexity in handling network partitions and partial failures. Potential for temporary stock unavailability during reservation periods.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle network partitions in critical inventory regions?</li>
+                                <li>What happens when consensus nodes become unavailable during high-traffic periods?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show deep understanding of consistency guarantees and business impact of different trade-offs.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="multi-region-architecture">
+                <h2>Multi-Region Architecture</h2>
+                
+                <div class="question">
+                    <h3>Q5: Design a multi-region deployment for a financial services platform requiring 99.99% availability with strict data residency requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement active-active multi-region architecture with region-specific data isolation, cross-region disaster recovery, automated failover mechanisms, and compliance-aware data routing to achieve high availability while meeting regulatory requirements.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design an active-active multi-region architecture with dedicated data centers in required jurisdictions (US, EU, APAC). Each region operates independently with complete application stacks and region-specific data stores to satisfy data residency requirements. Implement intelligent DNS-based routing directing users to their home region with health-check-based failover.</p>
+
+                            <p>For 99.99% availability (52.56 minutes downtime/year), implement automated failover with health checks every 30 seconds and failover completion within 2 minutes. Use circuit breakers to isolate failing components and graceful degradation for non-critical features. Deploy blue-green deployments within each region to minimize deployment-related downtime.</p>
+
+                            <p>Implement data synchronization for shared reference data (exchange rates, regulatory parameters) using event-driven replication with conflict resolution. Critical financial transactions remain region-locked, while read-only queries can leverage cross-region read replicas with appropriate data classification.</p>
+
+                            <p>Deploy chaos engineering practices to regularly test failover scenarios. Use synthetic monitoring to detect issues before customer impact. Implement runbook automation for common failure scenarios to reduce mean time to recovery (MTTR).</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Significantly higher infrastructure costs (3x minimum). Increased complexity for cross-region operations. Potential data inconsistencies during network partitions. Regulatory complexity for emergency cross-region access.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle regulatory audits across multiple jurisdictions?</li>
+                                <li>What's your strategy for cross-region disaster recovery testing?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize regulatory awareness and operational excellence in failure scenarios.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="caching-strategies">
+                <h2>Caching Strategies</h2>
+                
+                <div class="question">
+                    <h3>Q6: Design a multi-tier caching strategy for a content delivery platform serving 10M users with dynamic personalization requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement hierarchical caching with CDN for static content, application-level caching with Redis cluster for dynamic data, and edge-side includes for personalized content assembly, optimized for cache hit rates and invalidation efficiency.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design a 4-tier caching hierarchy: L1 (browser cache) for static assets with long TTLs, L2 (CDN/edge cache) for semi-dynamic content with geographic distribution, L3 (application cache) using Redis cluster for user sessions and computed data, and L4 (database query cache) for expensive database operations.</p>
+
+                            <p>For personalization, implement cache fragmentation by user segments rather than individual users to improve cache hit rates. Use edge-side includes (ESI) to assemble personalized pages from cached fragments. Deploy cache-aside pattern with read-through caching for high-traffic data and write-behind caching for analytics data.</p>
+
+                            <p>Implement intelligent cache invalidation using event-driven invalidation patterns. When user preferences change, invalidate only affected cache segments. Use cache warming during deployment to prevent cold cache performance issues. Deploy cache analytics to monitor hit rates and optimize TTL values based on actual usage patterns.</p>
+
+                            <p>Handle cache consistency using versioned keys and two-phase invalidation for critical data updates. Implement circuit breakers to handle cache failures gracefully, falling back to database queries with appropriate rate limiting during cache unavailability.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Memory costs (potentially 20-30% of infrastructure budget) vs response time improvements. Cache invalidation complexity vs data consistency. Personalization granularity vs cache efficiency.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle cache warming after large-scale cache evictions?</li>
+                                <li>What's your strategy for caching user-generated content with moderation requirements?</li>
+                                <li>How do you implement cache versioning during application deployments?</li>
+                                <li>What metrics drive your cache TTL optimization decisions?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure cached data complies with user privacy regulations?</li>
+                                <li>What strategies prevent cache stampede during high-traffic events?</li>
+                                <li>How do you validate cache effectiveness without impacting user experience?</li>
+                                <li>What's your approach for cache security and preventing cache poisoning?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of cache economics and business impact of cache performance on user engagement.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="api-gateway-patterns">
+                <h2>API Gateway Patterns</h2>
+                
+                <div class="question">
+                    <h3>Q7: Design an API Gateway architecture for a microservices ecosystem with 100+ services requiring authentication, rate limiting, request transformation, and circuit breaking.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement federated API gateway architecture with service mesh integration, centralized policy enforcement, dynamic service discovery, and observability features to manage complex microservices interactions while maintaining performance and reliability.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design a two-tier API gateway architecture: external-facing gateways handling public API traffic with comprehensive security, and internal gateways managing service-to-service communication. Deploy multiple gateway instances behind load balancers with automatic scaling based on request volume and latency metrics.</p>
+
+                            <p>Implement centralized authentication using JWT tokens with distributed validation to avoid single points of failure. Deploy hierarchical rate limiting with global, tenant, and user-specific limits using Redis cluster for state management. Use policy-as-code frameworks to manage authentication, authorization, and routing rules consistently across environments.</p>
+
+                            <p>Integrate with service mesh (Istio/Linkerd) for advanced traffic management, mutual TLS, and distributed tracing. Implement request/response transformation using configurable pipelines for API versioning and backward compatibility. Deploy circuit breakers with exponential backoff and jitter to prevent cascade failures across service dependencies.</p>
+
+                            <p>Use dynamic service discovery with health check integration to automatically route traffic to healthy instances. Implement canary deployments at the gateway level for gradual rollouts. Deploy comprehensive monitoring with request tracing, performance metrics, and business KPI tracking integrated with alerting systems.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Gateway becomes potential bottleneck vs centralized policy enforcement benefits. Additional latency from transformation and validation vs API standardization. Increased complexity vs operational visibility and control.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle API gateway failures without service disruption?</li>
+                                <li>What's your strategy for API versioning and deprecation through the gateway?</li>
+                                <li>How do you implement request batching and response aggregation?</li>
+                                <li>What's your approach for handling long-running requests and WebSocket connections?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure API gateway configuration changes don't impact security?</li>
+                                <li>What strategies prevent API gateway from becoming a performance bottleneck?</li>
+                                <li>How do you validate policy enforcement effectiveness across all services?</li>
+                                <li>What's your approach for API gateway disaster recovery and cross-region failover?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of API governance challenges and operational complexity in large microservices environments.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="microservices-decomposition">
+                <h2>Microservices Decomposition</h2>
+                
+                <div class="question">
+                    <h3>Q8: Design the decomposition of a monolithic e-commerce application into microservices while maintaining data consistency and minimizing service coupling.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Apply domain-driven design principles to identify bounded contexts, implement database-per-service pattern with event-driven data synchronization, and use strangler fig pattern for gradual migration while maintaining system stability.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Start with domain-driven design to identify bounded contexts: User Management, Product Catalog, Inventory Management, Order Processing, Payment Processing, and Notification Services. Each service owns its data and business logic within its domain boundary, communicating through well-defined APIs and events.</p>
+
+                            <p>Implement database-per-service pattern with careful attention to data relationships. For shared reference data (product catalogs), use event-driven replication. For transactional data spanning services (orders referencing users and products), implement saga patterns with compensation logic for distributed transaction management.</p>
+
+                            <p>Use strangler fig pattern for gradual migration: route specific functionality to new services while keeping existing monolith operational. Start with read-only services (Product Catalog), then move to independent services (Notifications), and finally tackle complex transactional services (Order Processing). Implement feature flags to control traffic routing during migration.</p>
+
+                            <p>Design service interfaces using async messaging for eventual consistency scenarios and synchronous APIs for immediate consistency requirements. Implement circuit breakers and retry logic to handle inter-service communication failures. Use service mesh for observability, security, and traffic management across the decomposed architecture.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Increased operational complexity vs improved scalability and team autonomy. Network overhead from service communication vs deployment independence. Data consistency challenges vs service isolation benefits.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle shared business logic across multiple services?</li>
+                                <li>What's your strategy for managing database schema changes across services?</li>
+                                <li>How do you implement cross-service transactions and maintain ACID properties?</li>
+                                <li>What's your approach for service versioning and backward compatibility?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure microservices decomposition doesn't violate compliance requirements?</li>
+                                <li>What strategies prevent service proliferation from impacting system performance?</li>
+                                <li>How do you validate service boundaries remain appropriate as business requirements evolve?</li>
+                                <li>What's your approach for managing technical debt during microservices migration?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize business domain understanding and demonstrate systematic approach to complex system migration.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="event-driven-architecture">
+                <h2>Event-Driven Architecture</h2>
+                
+                <div class="question">
+                    <h3>Q9: Design an event-driven architecture for a financial trading platform requiring real-time processing, audit trails, and exactly-once delivery guarantees.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement event sourcing with CQRS pattern, deploy distributed event streaming using Kafka with idempotent consumers, and design comprehensive audit capabilities with regulatory compliance features for financial transaction processing.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design event sourcing architecture where all state changes are captured as immutable events in append-only event store. Implement CQRS to separate command processing (write side) from query processing (read side) with materialized views optimized for different query patterns. Use Kafka as the event backbone with appropriate partitioning strategies to maintain ordering guarantees per trading account.</p>
+
+                            <p>Implement exactly-once processing using idempotent event handlers with deduplication based on event IDs. Deploy transactional outbox pattern to ensure atomicity between business logic execution and event publishing. Use event schema registry with backward compatibility to handle event evolution without breaking existing consumers.</p>
+
+                            <p>Design comprehensive audit trails capturing all events with immutable timestamps, cryptographic signatures, and correlation IDs for regulatory compliance. Implement event replay capabilities for system recovery and debugging. Deploy event archival strategies with long-term storage for regulatory retention requirements (typically 7+ years for financial data).</p>
+
+                            <p>Handle real-time processing using stream processing frameworks (Kafka Streams, Apache Flink) with sub-millisecond latency requirements. Implement circuit breakers and bulkheads to isolate failures. Deploy monitoring for event processing lag, throughput, and error rates with alerting for SLA violations.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Storage costs for complete event history vs auditability and replay capabilities. Complexity of event schema evolution vs system flexibility. Higher infrastructure costs vs real-time processing capabilities.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle event ordering across multiple partitions for related trading activities?</li>
+                                <li>What's your strategy for event schema evolution without breaking regulatory audit trails?</li>
+                                <li>How do you implement event replay for specific time ranges or business scenarios?</li>
+                                <li>What's your approach for handling duplicate events in critical financial processing?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure event-driven architecture meets financial industry security requirements?</li>
+                                <li>What strategies prevent event processing delays from impacting trading performance?</li>
+                                <li>How do you validate exactly-once delivery guarantees in production environments?</li>
+                                <li>What's your approach for disaster recovery in event-driven systems with regulatory requirements?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of financial industry constraints and show how architecture choices support both technical and business requirements.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="capacity-planning-scaling">
+                <h2>Capacity Planning & Scaling</h2>
+                
+                <div class="question">
+                    <h3>Q10: Design a capacity planning strategy for a social media platform expecting 10x growth over 18 months while maintaining cost efficiency and performance SLAs.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement predictive scaling using historical data analysis, deploy auto-scaling with multiple metrics, design tiered storage strategies, and establish cost optimization frameworks to handle exponential growth efficiently.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement predictive capacity planning using machine learning models trained on historical usage patterns, seasonal trends, and external factors (events, holidays, marketing campaigns). Develop growth models accounting for user acquisition rates, engagement patterns, and feature adoption to forecast infrastructure needs 6-12 months ahead.</p>
+
+                            <p>Deploy multi-dimensional auto-scaling based on CPU utilization, memory usage, request queue depth, and business metrics (active users, posts per second). Implement proactive scaling using predictive algorithms to scale infrastructure before demand spikes. Use containerization with Kubernetes for efficient resource utilization and rapid scaling.</p>
+
+                            <p>Design tiered storage architecture: hot storage (SSD) for recent/active content, warm storage (high-performance HDD) for moderately accessed content, and cold storage (object storage) for archived content. Implement automated data lifecycle management based on access patterns and content age. Use content compression and deduplication to optimize storage efficiency.</p>
+
+                            <p>Establish cost optimization framework with regular capacity reviews, rightsizing recommendations, and reserved instance planning. Implement resource tagging and cost allocation to track spending by feature/team. Deploy chaos engineering to identify over-provisioned resources and optimization opportunities.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Predictive scaling accuracy vs infrastructure costs. Auto-scaling responsiveness vs cost optimization. Storage tiering complexity vs cost savings (typically 40-60% storage cost reduction).
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle capacity planning for viral content events that exceed historical patterns?</li>
+                                <li>What's your strategy for capacity planning during major feature launches or platform changes?</li>
+                                <li>How do you implement capacity planning for global expansion into new geographic regions?</li>
+                                <li>What metrics drive your storage tiering and lifecycle management decisions?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure capacity planning decisions align with business growth projections and budget constraints?</li>
+                                <li>What strategies prevent over-provisioning while maintaining performance SLAs during unexpected growth?</li>
+                                <li>How do you validate capacity planning models and adjust for changing user behavior patterns?</li>
+                                <li>What's your approach for balancing cost optimization with reliability and performance requirements?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of business growth implications and demonstrate quantitative approach to capacity planning with concrete metrics.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="disaster-recovery-failover">
+                <h2>Disaster Recovery & Failover</h2>
+                
+                <div class="question">
+                    <h3>Q11: Design a disaster recovery strategy for a banking application requiring RPO < 1 minute and RTO < 5 minutes with cross-region failover capabilities.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement active-active architecture with synchronous replication for critical data, automated failover mechanisms with comprehensive health checks, and detailed recovery procedures with regular testing to meet stringent banking requirements.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design active-active multi-region architecture with primary and secondary data centers. Implement synchronous replication for critical financial data (account balances, transactions) and asynchronous replication for non-critical data (logs, analytics). Use database clustering with automatic failover and connection pooling to minimize connection disruption during failover events.</p>
+
+                            <p>Deploy comprehensive health monitoring with application-level, database-level, and infrastructure-level checks every 10-15 seconds. Implement automated failover triggered by consecutive health check failures (3+ failures within 1 minute). Use consensus-based decision making to prevent split-brain scenarios during network partitions. Ensure failover completes within 3-4 minutes to meet RTO requirements.</p>
+
+                            <p>Implement data consistency validation during failover using checksum verification and transaction log comparison. Deploy automated rollback mechanisms if data inconsistencies are detected during failover. Use write-ahead logging and point-in-time recovery capabilities to minimize data loss and meet RPO requirements.</p>
+
+                            <p>Establish detailed runbook procedures with automated recovery scripts for common failure scenarios. Implement regular disaster recovery drills (quarterly) with full failover testing during low-traffic periods. Deploy chaos engineering practices to identify weaknesses in disaster recovery procedures and improve system resilience.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Significant infrastructure costs (2-3x) vs availability requirements. Synchronous replication latency vs data consistency guarantees. Automated failover speed vs risk of false positives causing unnecessary failovers.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle disaster recovery testing without impacting production banking operations?</li>
+                                <li>What's your strategy for coordinating failover across multiple interconnected banking systems?</li>
+                                <li>How do you implement disaster recovery for regulatory reporting systems with strict compliance requirements?</li>
+                                <li>What's your approach for handling partial system failures that don't warrant full disaster recovery activation?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure disaster recovery procedures comply with banking regulations across different jurisdictions?</li>
+                                <li>What strategies prevent disaster recovery from becoming a security vulnerability?</li>
+                                <li>How do you validate disaster recovery effectiveness without risking customer data or operations?</li>
+                                <li>What's your approach for disaster recovery communication with regulators and stakeholders during actual incidents?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize regulatory compliance awareness and demonstrate understanding of financial industry availability requirements.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="advanced-architecture-patterns">
+                <h2>Advanced Architecture Patterns</h2>
+                
+                <div class="question">
+                    <h3>Q12: Design a CQRS and Event Sourcing architecture for a multi-tenant SaaS platform with complex reporting requirements and audit compliance.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement CQRS with separate command and query models, event sourcing for complete audit trails, tenant-specific read models optimized for different reporting needs, and compliance features for regulatory requirements.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design CQRS architecture with clear separation between command side (write operations) and query side (read operations). Command side processes business operations and generates events, while query side maintains denormalized read models optimized for specific query patterns. Use event store as the source of truth with all state changes captured as immutable events.</p>
+
+                            <p>Implement tenant-specific event streams and read models to ensure data isolation and performance optimization. Deploy projection managers to build and maintain different read models for various reporting requirements: real-time dashboards, analytical reports, and compliance reporting. Use eventual consistency between command and query sides with configurable consistency levels based on business requirements.</p>
+
+                            <p>Design comprehensive audit capabilities capturing all events with metadata (user, timestamp, IP address, correlation IDs). Implement event encryption for sensitive data and digital signatures for tamper detection. Deploy event replay capabilities for compliance reporting, system recovery, and temporal queries ("show system state at specific point in time").</p>
+
+                            <p>Handle complex reporting through specialized projections: aggregate events into time-series data for trend analysis, build denormalized views for complex joins, and maintain snapshot projections for large dataset queries. Implement incremental projection updates to minimize resource usage and maintain real-time reporting capabilities.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Increased storage requirements (2-3x) for event store and multiple read models vs query performance and auditability. System complexity vs flexibility and maintainability. Eventual consistency challenges vs scalability benefits.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle event schema evolution in a multi-tenant environment with different upgrade schedules?</li>
+                                <li>What's your strategy for optimizing projection performance for large tenants with millions of events?</li>
+                                <li>How do you implement tenant-specific business rules and validation in the command side?</li>
+                                <li>What's your approach for handling conflicting events and maintaining business invariants?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure CQRS implementation meets data privacy regulations for different tenant types?</li>
+                                <li>What strategies prevent event store growth from impacting system performance over time?</li>
+                                <li>How do you validate eventual consistency doesn't violate business requirements or compliance rules?</li>
+                                <li>What's your approach for disaster recovery in event-sourced systems with regulatory audit requirements?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate deep understanding of CQRS/ES trade-offs and show how architectural choices support both technical scalability and business requirements.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="study-guide">
+                <h2>How to Use This Study Guide</h2>
+                
+                <h3>Study Approach</h3>
+                <ul>
+                    <li>Spend 1 hour daily focusing on 2-3 questions per topic</li>
+                    <li>Practice drawing architecture diagrams for each scenario</li>
+                    <li>Time yourself: 5 minutes for summary, 15 minutes for detailed explanation</li>
+                    <li>Create flashcards for key trade-offs and failure modes</li>
+                </ul>
+
+                <h3>Mock Interview Pacing</h3>
+                <ul>
+                    <li>Start with high-level design (10 minutes)</li>
+                    <li>Deep dive into 2-3 components (20 minutes)</li>
+                    <li>Discuss trade-offs and alternatives (10 minutes)</li>
+                    <li>Address scalability and failure scenarios (15 minutes)</li>
+                </ul>
+
+                <h3>Focus Areas</h3>
+                <p>Master the fundamentals first, then tackle advanced scenarios. Practice capacity planning calculations and be ready to defend architectural decisions with concrete metrics.</p>
+            </div>
+        </main>
+
+        <a href="#" class="back-to-top">↑</a>
+    </div>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Show/hide back to top button
+        window.addEventListener('scroll', function() {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+
+        // Back to top functionality
+        document.querySelector('.back-to-top').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

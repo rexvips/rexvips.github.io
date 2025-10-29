@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithms & Data Structures - Principal/Staff Engineer Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Algorithms & Data Structures for Principal/Staff Engineers</h1>
+            <div class="subtitle">Master algorithms and data structures with system-level impact focus, emphasizing concurrency-safe implementations, performance optimization, and distributed system applications.</div>
+        </header>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="01-system-design.html">System Design</a></li>
+                <li><a href="02-distributed-systems.html">Distributed Systems</a></li>
+                <li><a href="03-databases-storage.html">Databases & Storage</a></li>
+                <li><a href="04-performance-jvm.html">Performance & JVM</a></li>
+                <li><a href="05-event-driven-kafka.html">Event-Driven & Kafka</a></li>
+                <li><a href="06-observability-monitoring.html">Observability</a></li>
+                <li><a href="07-security-compliance.html">Security & Compliance</a></li>
+                <li><a href="08-leadership-tradeoffs.html">Leadership & Trade-offs</a></li>
+                <li><a href="09-testing-cicd.html">Testing & CI/CD</a></li>
+                <li><a href="10-algorithms-datastructures.html" class="active">Algorithms & Data Structures</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <div class="toc">
+                <h2>Table of Contents</h2>
+                <ol>
+                    <li><a href="#concurrency-safe-data-structures">Concurrency-Safe Data Structures</a></li>
+                    <li><a href="#rate-limiting-algorithms">Rate Limiting Algorithms</a></li>
+                    <li><a href="#distributed-algorithms">Distributed Algorithms</a></li>
+                    <li><a href="#caching-eviction-algorithms">Caching & Eviction Algorithms</a></li>
+                    <li><a href="#probabilistic-data-structures">Probabilistic Data Structures</a></li>
+                    <li><a href="#graph-algorithms-for-systems">Graph Algorithms for Systems</a></li>
+                    <li><a href="#string-algorithms-search">String Algorithms & Search</a></li>
+                    <li><a href="#streaming-algorithms">Streaming Algorithms</a></li>
+                    <li><a href="#load-balancing-algorithms">Load Balancing Algorithms</a></li>
+                    <li><a href="#consensus-coordination">Consensus & Coordination</a></li>
+                    <li><a href="#memory-management">Memory Management</a></li>
+                    <li><a href="#performance-optimization">Performance Optimization</a></li>
+                </ol>
+            </div>
+
+            <section id="concurrency-safe-data-structures">
+                <h2>Concurrency-Safe Data Structures</h2>
+                
+                <div class="question">
+                    <h3>Q1: Design a thread-safe LRU cache supporting 100K+ concurrent operations per second with minimal contention and consistent O(1) performance characteristics.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement lock-free LRU cache using segmented design, compare-and-swap operations, and memory layout optimization to achieve high concurrency performance while maintaining cache semantics.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design segmented LRU cache with multiple independent cache segments (16-32 segments) to reduce contention. Each segment maintains its own LRU list and hash map, with global hash function distributing keys across segments. This reduces lock contention from all threads competing for single lock to threads competing within segments.</p>
+
+                            <p>Implement lock-free operations using compare-and-swap (CAS) for atomic updates. Use hazard pointers or epoch-based memory reclamation to safely manage memory in lock-free environment. Design cache entry structure with atomic reference counting and version numbers to handle concurrent access without locks.</p>
+
+                            <p>Optimize memory layout for cache performance using cache-line padding to prevent false sharing between segments. Align data structures to cache line boundaries (64 bytes) and use memory pools for cache entry allocation to reduce memory fragmentation and improve locality.</p>
+
+                            <p>Implement adaptive concurrency control monitoring contention levels and adjusting segment count or switching to different synchronization mechanisms (spin locks, reader-writer locks) based on access patterns and system load characteristics.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Memory overhead (30-50% for segmentation) vs contention reduction. Implementation complexity vs performance gains. Lock-free benefits vs debugging difficulty.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle cache coherence when implementing distributed LRU cache across multiple nodes?</li>
+                                <li>What's your strategy for LRU cache resizing without stopping concurrent operations?</li>
+                                <li>How do you implement cache statistics and monitoring without impacting performance?</li>
+                                <li>How do you handle cache warmup strategies for newly allocated segments?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate lock-free correctness without extensive testing infrastructure?</li>
+                                <li>What strategies prevent memory leaks in lock-free data structures during high contention?</li>
+                                <li>How do you measure and optimize cache performance under different workload patterns?</li>
+                                <li>What's your approach for debugging race conditions in lock-free implementations?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize understanding of concurrency challenges and practical performance optimization techniques.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="rate-limiting-algorithms">
+                <h2>Rate Limiting Algorithms</h2>
+                
+                <div class="question">
+                    <h3>Q2: Implement rate limiting for a public API serving 1M+ requests per minute with requirements for burst handling, user-specific limits, and distributed enforcement across multiple servers.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design multi-tier rate limiting using token bucket algorithm with Redis-based distributed state, hierarchical limiting strategies, and adaptive burst handling to protect API infrastructure while maintaining user experience.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement token bucket algorithm with configurable parameters: bucket capacity for burst handling, refill rate for sustained throughput, and per-user bucket isolation. Use Redis for distributed token bucket state with atomic operations ensuring consistency across multiple API gateway instances.</p>
+
+                            <p>Design hierarchical rate limiting with global limits (API-wide), tenant limits (per customer), user limits (per individual user), and endpoint limits (per API method). Implement precedence rules where most restrictive limit applies, with appropriate error responses indicating which limit was exceeded.</p>
+
+                            <p>Deploy adaptive rate limiting monitoring request patterns and automatically adjusting limits based on system capacity and user behavior. Implement burst detection allowing temporary limit increases for trusted users while maintaining protection against abuse patterns.</p>
+
+                            <p>Implement efficient distributed counting using Redis Lua scripts for atomic operations combining multiple rate limit checks in single Redis call. Use sliding window counters for more accurate rate limiting compared to fixed windows, implementing memory-efficient sliding window approximation.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Rate limiting accuracy vs performance overhead. Burst allowance vs system protection. Distributed coordination latency vs enforcement consistency.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle rate limiting for batch API operations that process multiple items per request?</li>
+                                <li>What's your strategy for rate limiting during system recovery after outages or maintenance?</li>
+                                <li>How do you implement rate limiting exemptions for critical business operations or emergency scenarios?</li>
+                                <li>How do you handle rate limiting across different API versions with varying performance characteristics?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you ensure rate limiting doesn't become a bottleneck for legitimate high-volume users?</li>
+                                <li>What strategies prevent rate limiting bypass through distributed attacks or spoofing?</li>
+                                <li>How do you validate rate limiting effectiveness without impacting user experience during testing?</li>
+                                <li>What's your approach for rate limiting configuration management and dynamic adjustment?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of rate limiting business impact and distributed system implementation challenges.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="distributed-algorithms">
+                <h2>Distributed Algorithms</h2>
+                
+                <div class="question">
+                    <h3>Q3: Design a distributed leader election algorithm for a microservices cluster requiring split-brain prevention, network partition tolerance, and sub-second failover times.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement Raft-based leader election with optimized timing parameters, witness nodes for split-brain prevention, and pre-vote mechanisms to achieve fast, reliable leadership transitions in distributed environments.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement Raft leader election with optimized timing parameters: heartbeat interval 50ms, election timeout randomized between 150-300ms, and pre-vote phase to prevent unnecessary elections. Use witness nodes (non-voting members) in even-numbered clusters to break ties and prevent split-brain scenarios.</p>
+
+                            <p>Design network partition tolerance using quorum-based decisions where leadership requires majority node acknowledgment. Implement failure detection using phi-accrual failure detectors adapting to network conditions and distinguishing between slow nodes and failed nodes.</p>
+
+                            <p>Deploy leadership transfer optimization allowing current leader to transfer leadership proactively during planned maintenance or when detecting performance degradation. Implement fast leader discovery allowing new nodes to quickly identify current leader without waiting for full election cycle.</p>
+
+                            <p>Implement leadership lease mechanisms where leader maintains leadership through periodic lease renewal with majority of nodes. Use lease-based fencing tokens preventing split-brain scenarios where network partitions create multiple leaders.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Election speed vs split-brain prevention. Network overhead for failure detection vs failover time. Quorum size requirements vs fault tolerance levels.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle leader election in asymmetric network partitions where some nodes can communicate but others cannot?</li>
+                                <li>What's your strategy for leader election during rolling updates or planned maintenance scenarios?</li>
+                                <li>How do you implement leader election for geographically distributed clusters with high network latency?</li>
+                                <li>How do you handle leader election when cluster membership changes dynamically?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate leader election correctness under various network failure scenarios?</li>
+                                <li>What strategies ensure leader election doesn't cause service disruption during normal operations?</li>
+                                <li>How do you monitor leader election health and detect pathological election behaviors?</li>
+                                <li>What's your approach for leader election performance optimization and tuning?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of distributed consensus challenges and practical implementation considerations.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="probabilistic-data-structures">
+                <h2>Probabilistic Data Structures</h2>
+                
+                <div class="question">
+                    <h3>Q4: Design a system for detecting duplicate content in a high-throughput content publishing platform using probabilistic data structures to minimize memory usage while maintaining accuracy.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement bloom filters with counting bloom filters for deletion support, hyperloglog for cardinality estimation, and layered filtering approach to achieve memory-efficient duplicate detection with configurable accuracy levels.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design layered probabilistic filtering using bloom filters for initial duplicate screening with configurable false positive rates (0.1-1%). Implement counting bloom filters supporting element deletion for content that expires or gets removed. Use multiple hash functions (3-5) with different seeds to minimize hash correlation.</p>
+
+                            <p>Deploy HyperLogLog for approximate cardinality tracking enabling duplicate rate estimation and capacity planning without storing actual content identifiers. Configure HyperLogLog precision (12-16 bits) balancing memory usage with accuracy requirements for different use cases.</p>
+
+                            <p>Implement content fingerprinting using locality-sensitive hashing (LSH) for near-duplicate detection beyond exact matches. Design MinHash signatures for jaccard similarity estimation enabling detection of content variations and derivative works.</p>
+
+                            <p>Design memory optimization strategies including bloom filter resizing, periodic filter regeneration, and tiered storage where hot filters stay in memory while cold filters move to SSD storage. Implement filter federation across multiple servers for scaling beyond single-node memory limits.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Memory efficiency vs false positive rates. Accuracy guarantees vs performance characteristics. Implementation complexity vs operational simplicity.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle probabilistic data structure maintenance during content purges and policy changes?</li>
+                                <li>What's your strategy for probabilistic structure accuracy validation in production environments?</li>
+                                <li>How do you implement probabilistic structures for content similarity detection beyond exact duplicates?</li>
+                                <li>How do you handle probabilistic structure coordination across geographically distributed systems?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate probabilistic structure accuracy without compromising memory efficiency benefits?</li>
+                                <li>What strategies prevent probabilistic structure degradation from impacting content quality?</li>
+                                <li>How do you monitor probabilistic structure performance and optimize for different content patterns?</li>
+                                <li>What's your approach for probabilistic structure configuration tuning and capacity planning?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of probabilistic structure trade-offs and practical applications in large-scale systems.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="streaming-algorithms">
+                <h2>Streaming Algorithms</h2>
+                
+                <div class="question">
+                    <h3>Q5: Implement real-time analytics for a social media platform calculating trending topics, user engagement metrics, and anomaly detection over unbounded data streams with memory constraints.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design streaming analytics using sliding window algorithms, reservoir sampling, and incremental statistics computation to process high-volume social media streams with bounded memory and real-time latency requirements.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement sliding window algorithms using time-based and count-based windows for trending topic calculation. Use exponential decay functions for time-weighted popularity scoring where recent activity has higher weight. Design memory-bounded windows with efficient data structure rotation (circular buffers, segment trees).</p>
+
+                            <p>Deploy reservoir sampling for maintaining representative samples of large data streams enabling statistical analysis without storing complete datasets. Implement adaptive sampling rates based on data velocity and available memory constraints.</p>
+
+                            <p>Design incremental statistics computation using online algorithms for mean, variance, and quantile estimation without storing historical data. Implement Count-Min Sketch for frequency estimation of hashtags and mentions with configurable accuracy parameters.</p>
+
+                            <p>Implement anomaly detection using streaming algorithms for outlier detection (Z-score, isolation forest adaptations) and change point detection (CUSUM, EWMA) enabling real-time identification of viral content or unusual activity patterns.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Real-time processing latency vs accuracy guarantees. Memory usage vs statistical precision. Algorithm complexity vs implementation maintainability.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle streaming algorithm state recovery after system failures or restarts?</li>
+                                <li>What's your strategy for streaming algorithm accuracy validation with ground truth data?</li>
+                                <li>How do you implement streaming algorithms for multi-dimensional data analysis and correlation detection?</li>
+                                <li>How do you handle streaming algorithm coordination across multiple processing nodes?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate streaming algorithm accuracy without access to complete datasets?</li>
+                                <li>What strategies ensure streaming algorithms maintain performance under varying data velocities?</li>
+                                <li>How do you monitor streaming algorithm health and detect algorithmic drift or degradation?</li>
+                                <li>What's your approach for streaming algorithm parameter tuning and performance optimization?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize understanding of streaming algorithm constraints and real-world applicability to large-scale data processing.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="graph-algorithms-for-systems">
+                <h2>Graph Algorithms for Systems</h2>
+                
+                <div class="question">
+                    <h3>Q6: Design dependency resolution and circular dependency detection for a package management system handling millions of packages with complex dependency trees.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement topological sorting with cycle detection, efficient dependency graph representation, and incremental update algorithms to handle large-scale package dependencies with performance and correctness guarantees.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design dependency graph representation using adjacency lists with efficient storage (compressed sparse row format) and indexing for fast dependency lookup. Implement bidirectional edges tracking both dependencies and dependents for efficient impact analysis during updates.</p>
+
+                            <p>Deploy topological sorting using Kahn's algorithm with cycle detection for dependency resolution ordering. Implement incremental topological sorting for efficient updates when packages are added/removed without full graph recomputation. Use DFS-based strong connected component detection for circular dependency identification.</p>
+
+                            <p>Design efficient cycle breaking strategies when circular dependencies are detected: identify minimum feedback arc set, provide user-friendly cycle reporting, and implement dependency conflict resolution policies (version ranges, optional dependencies).</p>
+
+                            <p>Implement dependency graph optimization including transitive reduction for storage efficiency, dependency caching for repeated resolution requests, and parallel dependency resolution for large dependency trees using work-stealing task scheduling.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Graph storage overhead vs query performance. Incremental update complexity vs full recomputation simplicity. Cycle detection accuracy vs performance characteristics.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle dependency resolution for packages with version constraints and compatibility requirements?</li>
+                                <li>What's your strategy for dependency graph updates when packages change their dependency requirements?</li>
+                                <li>How do you implement dependency resolution for different package ecosystems with varying dependency semantics?</li>
+                                <li>How do you handle dependency resolution performance for extremely large dependency graphs?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate dependency resolution correctness without extensive integration testing?</li>
+                                <li>What strategies prevent dependency resolution from becoming a bottleneck in package operations?</li>
+                                <li>How do you monitor dependency graph health and detect problematic dependency patterns?</li>
+                                <li>What's your approach for dependency resolution optimization and algorithm performance tuning?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of graph algorithm applications in system design and practical performance considerations.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="caching-eviction-algorithms">
+                <h2>Caching & Eviction Algorithms</h2>
+                
+                <div class="question">
+                    <h3>Q7: Design adaptive caching algorithms for a CDN serving diverse content types with varying access patterns, implementing intelligent eviction policies that maximize hit rates while considering content value and freshness requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement multi-tier caching with adaptive eviction algorithms combining LRU, LFU, and cost-based eviction policies, machine learning-driven cache warmup, and content-aware caching strategies to optimize hit rates and reduce origin server load.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design adaptive eviction algorithm combining multiple policies: LRU for temporal locality, LFU for frequency-based retention, and cost-based eviction considering content generation expense and network transfer costs. Implement ARC (Adaptive Replacement Cache) balancing recency and frequency with automatic parameter adjustment based on workload characteristics.</p>
+
+                            <p>Deploy content-aware caching policies considering content type, size, and business value. Implement different eviction strategies for static content (images, videos) vs dynamic content (API responses, HTML). Use content popularity prediction models based on historical access patterns and trending algorithms.</p>
+
+                            <p>Implement hierarchical caching with different algorithms at each tier: aggressive caching at edge nodes using simple LRU, sophisticated algorithms at regional caches using cost-benefit analysis, and intelligent prefetching at origin shields using access pattern prediction.</p>
+
+                            <p>Design cache warming algorithms using machine learning models predicting content demand based on temporal patterns, geographic trends, and content similarity. Implement proactive cache population during low-traffic periods and intelligent cache migration during peak loads.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Algorithm complexity vs cache performance gains. Memory overhead for metadata vs eviction accuracy. Prediction accuracy vs computational overhead for ML models.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle cache invalidation coordination across geographically distributed CDN nodes?</li>
+                                <li>What's your strategy for cache algorithm selection based on content characteristics and access patterns?</li>
+                                <li>How do you implement cache algorithms for multi-tenant environments with different SLA requirements?</li>
+                                <li>How do you handle cache algorithm performance during traffic spikes and DDoS attacks?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate cache algorithm effectiveness without impacting user experience during testing?</li>
+                                <li>What strategies prevent cache algorithm overhead from becoming a performance bottleneck?</li>
+                                <li>How do you monitor cache performance and detect when algorithms need retuning or replacement?</li>
+                                <li>What's your approach for cache algorithm A/B testing and gradual rollout of algorithm changes?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of caching business impact and algorithm selection criteria for different use cases.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="string-algorithms-search">
+                <h2>String Algorithms & Search</h2>
+                
+                <div class="question">
+                    <h3>Q8: Implement full-text search for a code repository hosting platform supporting fuzzy matching, code-aware tokenization, and real-time indexing with sub-second response times for millions of files.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design full-text search using suffix arrays, n-gram indexing, and approximate string matching algorithms with code-aware parsing, incremental indexing, and optimized data structures for fast search across large code repositories.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement suffix array-based indexing for exact pattern matching with O(m log n) search complexity where m is pattern length and n is text length. Use enhanced suffix arrays with LCP (Longest Common Prefix) arrays for efficient range queries and substring search operations.</p>
+
+                            <p>Deploy n-gram indexing (trigrams, 4-grams) for fuzzy matching and approximate string search. Implement edit distance algorithms (Wagner-Fischer, Myers) for typo tolerance with configurable similarity thresholds. Use BK-trees for efficient similarity search in metric spaces.</p>
+
+                            <p>Design code-aware tokenization using language-specific parsers (TreeSitter) for semantic search considering programming language syntax, identifier extraction, and comment processing. Implement symbol-aware search distinguishing between variable names, function names, and string literals.</p>
+
+                            <p>Implement incremental indexing using delta compression and append-only data structures minimizing reindexing overhead during code updates. Use bloom filters for negative lookups and inverted indexes with skip lists for efficient intersection operations during multi-term queries.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Index size vs search speed. Fuzzy matching accuracy vs false positive rates. Real-time indexing overhead vs search result freshness.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle search result ranking and relevance scoring for code search results?</li>
+                                <li>What's your strategy for search performance optimization across different programming languages?</li>
+                                <li>How do you implement search algorithms for binary files and compiled artifacts?</li>
+                                <li>How do you handle search algorithm scaling for repositories with millions of files?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate search result accuracy without comprehensive manual verification?</li>
+                                <li>What strategies ensure search algorithms maintain performance under high query loads?</li>
+                                <li>How do you monitor search quality and detect when algorithms need improvement or retraining?</li>
+                                <li>What's your approach for search algorithm experimentation and performance benchmarking?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of string algorithm applications in real-world search systems and performance optimization techniques.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="load-balancing-algorithms">
+                <h2>Load Balancing Algorithms</h2>
+                
+                <div class="question">
+                    <h3>Q9: Design intelligent load balancing for a microservices architecture handling heterogeneous workloads with different resource requirements, implementing adaptive algorithms that consider server capacity, request complexity, and circuit breaker states.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement adaptive load balancing using weighted round-robin with dynamic weight adjustment, least connections with request complexity consideration, and machine learning-driven routing decisions to optimize resource utilization and response times.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design weighted round-robin with dynamic weight calculation based on server capacity metrics (CPU, memory, network bandwidth) and historical performance data. Implement weight adjustment algorithms using exponential moving averages of response times and resource utilization with configurable decay factors.</p>
+
+                            <p>Deploy least connections algorithm enhanced with request complexity estimation considering request type, payload size, and expected processing time. Implement connection weight calculation factoring in active request complexity rather than simple connection counts.</p>
+
+                            <p>Implement consistent hashing for stateful services with virtual nodes for uniform distribution and minimal reshuffling during server additions/removals. Design hash ring rebalancing algorithms minimizing data movement while maintaining load distribution quality.</p>
+
+                            <p>Deploy machine learning-driven routing using reinforcement learning models that adapt routing decisions based on performance feedback. Implement multi-armed bandit algorithms for exploring new routing strategies while exploiting known good configurations. Use feature extraction from request characteristics for intelligent routing decisions.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Algorithm sophistication vs implementation complexity. Adaptive behavior vs routing stability. ML model accuracy vs decision latency overhead.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle load balancing algorithm coordination across multiple load balancer instances?</li>
+                                <li>What's your strategy for load balancing during server maintenance and rolling deployments?</li>
+                                <li>How do you implement load balancing algorithms for geographically distributed services?</li>
+                                <li>How do you handle load balancing for services with different SLA requirements and priority levels?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate load balancing effectiveness without disrupting production traffic?</li>
+                                <li>What strategies prevent load balancing algorithms from amplifying server failures or creating hot spots?</li>
+                                <li>How do you monitor load balancing quality and detect when algorithms need adjustment?</li>
+                                <li>What's your approach for load balancing algorithm testing and performance validation?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize understanding of load balancing impact on system reliability and user experience.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="consensus-coordination">
+                <h2>Consensus & Coordination</h2>
+                
+                <div class="question">
+                    <h3>Q10: Implement Byzantine Fault Tolerant consensus for a blockchain-based system requiring agreement among untrusted nodes with network delays, malicious actors, and varying computational capabilities.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design BFT consensus using PBFT algorithm with optimizations for practical deployment, including view changes, checkpoint mechanisms, and adaptive timeout strategies to achieve agreement in adversarial environments with performance guarantees.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Implement Practical Byzantine Fault Tolerance (PBFT) with three-phase protocol: pre-prepare, prepare, and commit phases ensuring safety and liveness properties. Design message authentication using digital signatures and message sequence numbers preventing replay attacks and ensuring message integrity.</p>
+
+                            <p>Deploy view change protocol handling primary node failures and malicious behavior. Implement timeout mechanisms with exponential backoff for detecting unresponsive primaries and triggering view changes. Design new-view messages with proof of primary failure including 2f+1 view-change messages from different nodes.</p>
+
+                            <p>Implement checkpoint mechanisms for garbage collection and state synchronization allowing nodes to discard old messages and catch up with network state. Design checkpoint proofs requiring 2f+1 matching checkpoint messages ensuring checkpoint validity across honest nodes.</p>
+
+                            <p>Deploy performance optimizations including message batching for throughput improvement, pipelined consensus for overlapping agreement instances, and speculative execution for reducing latency. Implement adaptive algorithms adjusting batch sizes and timeout parameters based on network conditions and node performance characteristics.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Byzantine fault tolerance vs performance overhead. Message complexity O(n²) vs network bandwidth. Safety guarantees vs liveness under network partitions.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle consensus algorithm performance when network latency varies significantly between nodes?</li>
+                                <li>What's your strategy for consensus algorithm recovery after extended network partitions?</li>
+                                <li>How do you implement consensus algorithms for dynamic membership where nodes join and leave frequently?</li>
+                                <li>How do you handle consensus algorithm optimization for different transaction types and priorities?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate consensus algorithm correctness under various Byzantine failure scenarios?</li>
+                                <li>What strategies prevent consensus algorithms from becoming bottlenecks in high-throughput systems?</li>
+                                <li>How do you monitor consensus health and detect potential security threats or performance degradation?</li>
+                                <li>What's your approach for consensus algorithm testing and security auditing?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of consensus algorithm security properties and practical deployment challenges.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="memory-management">
+                <h2>Memory Management</h2>
+                
+                <div class="question">
+                    <h3>Q11: Design custom memory allocation algorithms for a high-performance database system requiring predictable allocation latency, minimal fragmentation, and efficient memory reclamation for varying object sizes.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement slab allocation with size classes, memory pool management, and garbage collection algorithms optimized for database workloads with predictable performance, low fragmentation, and efficient concurrent access patterns.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design slab allocator with size classes for common object sizes (32B, 64B, 128B, etc.) reducing fragmentation and providing O(1) allocation/deallocation. Implement per-thread slabs reducing contention and cache coherency overhead while maintaining global free lists for load balancing between threads.</p>
+
+                            <p>Deploy memory pool management using large contiguous memory regions (2MB hugepages) minimizing TLB pressure and improving cache locality. Implement buddy system algorithm for coalescing adjacent free blocks and splitting large blocks for smaller allocations while maintaining alignment requirements.</p>
+
+                            <p>Implement generational garbage collection for managed objects with write barriers tracking inter-generational references. Design concurrent mark-and-sweep collector using tri-color marking algorithm allowing allocation during collection cycles with bounded pause times.</p>
+
+                            <p>Deploy memory compaction algorithms reducing fragmentation and improving cache locality. Implement copying collectors for young generation objects and mark-compact algorithms for old generation objects balancing collection overhead with fragmentation reduction.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Allocation speed vs fragmentation control. Memory overhead for metadata vs allocation efficiency. GC pause times vs throughput optimization.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle memory management for objects with different lifecycle patterns and access frequencies?</li>
+                                <li>What's your strategy for memory allocation during system recovery and database startup scenarios?</li>
+                                <li>How do you implement memory management for NUMA systems with multiple memory nodes?</li>
+                                <li>How do you handle memory allocation coordination in distributed database systems?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate memory management correctness without introducing significant performance overhead?</li>
+                                <li>What strategies prevent memory leaks and use-after-free errors in complex allocation scenarios?</li>
+                                <li>How do you monitor memory allocation patterns and optimize for changing workload characteristics?</li>
+                                <li>What's your approach for memory management testing and performance benchmarking?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of memory management impact on system performance and reliability in production environments.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="performance-optimization">
+                <h2>Performance Optimization</h2>
+                
+                <div class="question">
+                    <h3>Q12: Optimize algorithm performance for a real-time recommendation system requiring sub-10ms response times while processing user behavior data, content features, and collaborative filtering across millions of users and items.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement performance-optimized algorithms using cache-aware data structures, SIMD vectorization, approximate algorithms with error bounds, and parallel processing techniques to achieve real-time recommendation performance at scale.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design cache-aware data structures optimizing memory access patterns for modern CPU architectures. Implement blocked matrix operations for collaborative filtering ensuring data fits in L2/L3 cache. Use structure-of-arrays (SoA) layout instead of array-of-structures (AoS) for better vectorization and cache utilization.</p>
+
+                            <p>Deploy SIMD vectorization using AVX-512 instructions for parallel computation of similarity scores and matrix operations. Implement vectorized dot products, distance calculations, and aggregation operations achieving 8-16x speedup for numerical computations critical to recommendation algorithms.</p>
+
+                            <p>Implement approximate algorithms with probabilistic guarantees: locality-sensitive hashing for nearest neighbor search, random projection for dimensionality reduction, and sampling-based collaborative filtering reducing computation complexity while maintaining recommendation quality within acceptable error bounds.</p>
+
+                            <p>Deploy parallel processing using work-stealing algorithms for load balancing across CPU cores. Implement lockless data structures (atomic operations, RCU) for concurrent access to recommendation models and user profiles enabling parallel request processing without contention bottlenecks.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Optimization complexity vs maintainability. Approximation accuracy vs computational speedup. Memory usage for caching vs algorithm performance gains.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle performance optimization for algorithms running on different hardware architectures?</li>
+                                <li>What's your strategy for performance optimization validation without compromising recommendation quality?</li>
+                                <li>How do you implement performance optimization for algorithms with varying computational complexity?</li>
+                                <li>How do you handle performance optimization for real-time algorithms with strict latency requirements?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate performance optimization effectiveness across different workload patterns?</li>
+                                <li>What strategies ensure performance optimizations don't introduce correctness issues or regressions?</li>
+                                <li>How do you monitor algorithm performance and detect when optimizations need adjustment or replacement?</li>
+                                <li>What's your approach for performance optimization testing and regression detection?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize understanding of hardware-software co-design and performance optimization impact on user experience.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="study-guide">
+                <h2>How to Use This Study Guide</h2>
+                
+                <h3>Study Approach</h3>
+                <ul>
+                    <li>Implement algorithms from scratch to understand performance characteristics and trade-offs</li>
+                    <li>Practice algorithm selection for different system requirements and constraints</li>
+                    <li>Work through algorithm optimization scenarios with realistic performance targets</li>
+                    <li>Study algorithm applications in production systems and open-source projects</li>
+                </ul>
+
+                <h3>Mock Interview Pacing</h3>
+                <ul>
+                    <li>Understand problem constraints and requirements (5 minutes)</li>
+                    <li>Design algorithm approach with complexity analysis (15 minutes)</li>
+                    <li>Implement key algorithm components with optimization considerations (15 minutes)</li>
+                    <li>Discuss trade-offs, testing, and production deployment considerations (5 minutes)</li>
+                </ul>
+
+                <h3>Advanced Practice</h3>
+                <p>Focus on algorithms with direct system impact, concurrent implementations, and distributed algorithm coordination. Practice explaining algorithm choices in terms of business requirements and system constraints.</p>
+            </div>
+        </main>
+
+        <a href="#" class="back-to-top">↑</a>
+    </div>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        window.addEventListener('scroll', function() {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+
+        document.querySelector('.back-to-top').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
