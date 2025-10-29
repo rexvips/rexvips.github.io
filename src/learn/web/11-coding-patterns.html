@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Patterns - Principal/Staff Engineer Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Coding Patterns for Principal/Staff Engineers</h1>
+            <div class="subtitle">Master essential coding patterns and problem-solving techniques for technical interviews, focusing on scalable algorithms, optimization strategies, and system-level thinking.</div>
+        </header>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="01-system-design.html">System Design</a></li>
+                <li><a href="02-distributed-systems.html">Distributed Systems</a></li>
+                <li><a href="03-databases-storage.html">Databases & Storage</a></li>
+                <li><a href="04-performance-jvm.html">Performance & JVM</a></li>
+                <li><a href="05-event-driven-kafka.html">Event-Driven & Kafka</a></li>
+                <li><a href="06-observability-monitoring.html">Observability</a></li>
+                <li><a href="07-security-compliance.html">Security & Compliance</a></li>
+                <li><a href="08-leadership-tradeoffs.html">Leadership & Trade-offs</a></li>
+                <li><a href="09-testing-cicd.html">Testing & CI/CD</a></li>
+                <li><a href="10-algorithms-datastructures.html">Algorithms & Data Structures</a></li>
+                <li><a href="11-coding-patterns.html" class="active">Coding Patterns</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <div class="toc">
+                <h2>Table of Contents</h2>
+                <ol>
+                    <li><a href="#sliding-window-patterns">Sliding Window Patterns</a></li>
+                    <li><a href="#two-pointers-techniques">Two Pointers Techniques</a></li>
+                    <li><a href="#dynamic-programming-optimization">Dynamic Programming Optimization</a></li>
+                    <li><a href="#graph-traversal-patterns">Graph Traversal Patterns</a></li>
+                    <li><a href="#tree-manipulation-patterns">Tree Manipulation Patterns</a></li>
+                    <li><a href="#backtracking-strategies">Backtracking Strategies</a></li>
+                    <li><a href="#greedy-algorithm-patterns">Greedy Algorithm Patterns</a></li>
+                    <li><a href="#divide-conquer-optimization">Divide & Conquer Optimization</a></li>
+                    <li><a href="#bit-manipulation-techniques">Bit Manipulation Techniques</a></li>
+                    <li><a href="#string-processing-patterns">String Processing Patterns</a></li>
+                    <li><a href="#mathematical-problem-solving">Mathematical Problem Solving</a></li>
+                    <li><a href="#concurrency-parallel-patterns">Concurrency & Parallel Patterns</a></li>
+                </ol>
+            </div>
+
+            <section id="sliding-window-patterns">
+                <h2>Sliding Window Patterns</h2>
+                
+                <div class="question">
+                    <h3>Q1: Design a sliding window algorithm for real-time anomaly detection in high-frequency trading systems processing 1M+ transactions per second, requiring sub-microsecond latency and configurable window sizes.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement optimized sliding window using circular buffers, incremental statistics computation, and SIMD operations for real-time anomaly detection with predictable performance characteristics and memory-efficient data structures.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design fixed-size sliding window using circular buffer with power-of-2 sizing for efficient modulo operations via bitwise AND. Implement incremental statistics computation maintaining running sums, squared sums, and min/max values without recalculating entire window contents on each update.</p>
+
+                            <p>Deploy SIMD vectorization for parallel computation of statistical measures across multiple concurrent windows. Use AVX-512 instructions for 8-way parallel processing of price deltas, volume changes, and volatility calculations achieving sub-microsecond processing latency.</p>
+
+                            <p>Implement multi-resolution windows (1ms, 10ms, 100ms, 1s) using hierarchical aggregation where smaller windows feed into larger windows. Design memory-aligned data structures preventing false sharing between CPU cores and optimizing cache performance for concurrent access patterns.</p>
+
+                            <p>Deploy anomaly detection using Z-score calculation with configurable thresholds, exponentially weighted moving averages for trend detection, and percentile-based outlier identification. Implement lockless algorithms using atomic operations for concurrent window updates from multiple trading threads.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Memory usage for multiple window sizes vs detection accuracy. Fixed window size vs adaptive sizing overhead. Vectorization complexity vs processing latency.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle sliding window synchronization across distributed trading systems with clock skew?</li>
+                                <li>What's your strategy for sliding window pattern optimization when window sizes change dynamically?</li>
+                                <li>How do you implement sliding windows for non-uniform time intervals and missing data points?</li>
+                                <li>How do you handle sliding window memory management for long-running systems with varying loads?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate sliding window accuracy without introducing performance overhead in production?</li>
+                                <li>What strategies prevent sliding window algorithms from becoming bottlenecks during market volatility?</li>
+                                <li>How do you monitor sliding window performance and detect algorithmic degradation?</li>
+                                <li>What's your approach for sliding window testing with realistic high-frequency data patterns?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize understanding of sliding window optimization techniques and real-time system constraints.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="two-pointers-techniques">
+                <h2>Two Pointers Techniques</h2>
+                
+                <div class="question">
+                    <h3>Q2: Implement efficient duplicate detection and deduplication for a large-scale data processing pipeline using two-pointers technique, handling billions of records with memory constraints and parallel processing requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design two-pointers algorithm with external sorting, memory-mapped files, and parallel processing for scalable duplicate detection, implementing sophisticated comparison logic and efficient memory management for large datasets.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design external merge sort preprocessing for two-pointers duplicate detection, partitioning large datasets into memory-sized chunks (1-2GB) that can be sorted in-memory. Use memory-mapped files for efficient sequential access patterns minimizing I/O overhead during comparison operations.</p>
+
+                            <p>Implement parallel two-pointers processing using multiple worker threads, each handling different data partitions. Design work-stealing algorithms for load balancing when partition sizes vary due to data skew. Use atomic counters and lockless data structures for coordinating duplicate counts across threads.</p>
+
+                            <p>Deploy sophisticated comparison logic handling partial matches, fuzzy duplicates using edit distance, and configurable similarity thresholds. Implement early termination optimizations when comparing records with different prefixes or when similarity scores fall below thresholds.</p>
+
+                            <p>Design incremental duplicate detection for streaming data using bloom filters for initial filtering followed by exact two-pointers comparison. Implement sliding window deduplication for time-based duplicate detection with configurable time windows and aging policies.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> External sorting overhead vs memory constraints. Parallel processing complexity vs throughput gains. Fuzzy matching accuracy vs computational cost.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle two-pointers techniques for data with complex nested structures and varying schemas?</li>
+                                <li>What's your strategy for two-pointers optimization when data distribution is highly skewed?</li>
+                                <li>How do you implement two-pointers for real-time duplicate detection in streaming environments?</li>
+                                <li>How do you handle two-pointers coordination across distributed processing nodes?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate two-pointers algorithm correctness for large datasets without manual verification?</li>
+                                <li>What strategies ensure two-pointers performance scales linearly with data size increases?</li>
+                                <li>How do you monitor two-pointers efficiency and detect when algorithms need optimization?</li>
+                                <li>What's your approach for two-pointers memory usage optimization and garbage collection tuning?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of two-pointers scalability challenges and optimization strategies for large datasets.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="dynamic-programming-optimization">
+                <h2>Dynamic Programming Optimization</h2>
+                
+                <div class="question">
+                    <h3>Q3: Optimize dynamic programming algorithms for resource allocation in cloud environments, handling multi-dimensional constraints and real-time recomputation requirements with thousands of resources and constraints.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement space-optimized DP with memoization strategies, bottom-up computation with parallelization, and incremental updates for real-time resource allocation with complex multi-dimensional constraints and optimization objectives.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design space-optimized DP using rolling arrays and state compression techniques reducing memory complexity from O(n²) to O(n) for multi-dimensional resource allocation problems. Implement sparse representation for DP tables when most states are unreachable or have default values.</p>
+
+                            <p>Deploy bottom-up DP computation with parallel processing using wavefront parallelization pattern. Partition DP computation into independent subproblems that can be computed concurrently, using dependency graphs to determine parallel execution order and synchronization points.</p>
+
+                            <p>Implement incremental DP updates for real-time constraint changes avoiding full recomputation. Design differential algorithms that identify affected DP states and propagate changes through dependency chains. Use lazy evaluation for DP states that may not be needed immediately.</p>
+
+                            <p>Deploy memoization optimization using LRU caches for frequently accessed DP states and bloom filters for negative lookups. Implement approximation algorithms using bounded DP where solution quality is traded for computation time when exact solutions are too expensive.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Space optimization vs computation complexity. Parallel processing overhead vs speedup gains. Approximation accuracy vs computational time savings.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle DP optimization for problems with probabilistic constraints and uncertain parameters?</li>
+                                <li>What's your strategy for DP algorithm selection when problem characteristics change dynamically?</li>
+                                <li>How do you implement DP for multi-objective optimization with conflicting goals?</li>
+                                <li>How do you handle DP scaling for problems with exponentially large state spaces?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate DP algorithm correctness for complex multi-dimensional optimization problems?</li>
+                                <li>What strategies ensure DP performance remains acceptable as problem size increases?</li>
+                                <li>How do you monitor DP convergence and detect when algorithms need parameter tuning?</li>
+                                <li>What's your approach for DP algorithm testing with realistic constraint combinations?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of DP optimization techniques and practical applications in resource management systems.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="graph-traversal-patterns">
+                <h2>Graph Traversal Patterns</h2>
+                
+                <div class="question">
+                    <h3>Q4: Design efficient graph traversal algorithms for social network analysis processing friendship graphs with billions of nodes and edges, implementing parallel BFS/DFS with load balancing and memory optimization.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement parallel graph traversal using distributed BFS/DFS with graph partitioning, load balancing strategies, and memory-efficient data structures for large-scale social network analysis with real-time query requirements.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design parallel BFS using level-synchronous approach with work-stealing queues for load balancing between threads. Implement graph partitioning using METIS or similar algorithms to minimize edge cuts and balance computational load. Use compressed sparse row (CSR) format for memory-efficient graph representation.</p>
+
+                            <p>Deploy distributed graph traversal across multiple machines using vertex-cut partitioning where high-degree vertices are replicated across machines. Implement message passing for cross-partition edge traversal with batching and compression to minimize network overhead.</p>
+
+                            <p>Implement bidirectional search optimization for shortest path queries between distant nodes, meeting in the middle to reduce search space exponentially. Design A* heuristics using graph embedding or landmark-based distance estimation for directed search in large graphs.</p>
+
+                            <p>Deploy memory optimization using external memory algorithms when graphs exceed RAM capacity. Implement graph streaming algorithms processing edge streams with limited memory, using sketch-based approximation algorithms for connectivity and reachability queries.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Parallelization overhead vs traversal speedup. Memory usage for graph storage vs query performance. Approximation accuracy vs memory constraints.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle graph traversal for dynamic graphs where edges are added/removed frequently?</li>
+                                <li>What's your strategy for graph traversal optimization when graph topology changes over time?</li>
+                                <li>How do you implement graph traversal for weighted graphs with complex edge attributes?</li>
+                                <li>How do you handle graph traversal coordination across geographically distributed data centers?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate graph traversal correctness for billion-node graphs without exhaustive testing?</li>
+                                <li>What strategies ensure graph traversal performance scales with increasing graph density?</li>
+                                <li>How do you monitor graph traversal efficiency and detect algorithmic bottlenecks?</li>
+                                <li>What's your approach for graph traversal load testing and performance benchmarking?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize understanding of graph algorithm scalability and distributed processing challenges.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tree-manipulation-patterns">
+                <h2>Tree Manipulation Patterns</h2>
+                
+                <div class="question">
+                    <h3>Q5: Implement concurrent B+ tree operations for a high-performance database index supporting millions of concurrent read/write operations with MVCC semantics and crash recovery guarantees.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design lock-free B+ tree with optimistic concurrency control, MVCC support, and write-ahead logging for crash recovery, implementing sophisticated node splitting/merging algorithms and memory management for high-concurrency database workloads.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design lock-free B+ tree using compare-and-swap operations for atomic node updates and optimistic concurrency control. Implement node versioning with sequence numbers allowing readers to detect concurrent modifications and retry operations when necessary. Use hazard pointers for safe memory reclamation in concurrent environment.</p>
+
+                            <p>Deploy MVCC semantics using timestamped key versions within leaf nodes, maintaining multiple versions of values with visibility information. Implement garbage collection for old versions using epoch-based memory management, ensuring crashed transactions don't see uncommitted changes.</p>
+
+                            <p>Implement sophisticated node splitting and merging algorithms handling concurrent operations during structural modifications. Design copy-on-write semantics for internal nodes minimizing lock contention during tree restructuring operations. Use atomic pointer updates for publishing tree structure changes.</p>
+
+                            <p>Deploy write-ahead logging for crash recovery with logical logging of tree operations (insert, delete, split, merge) and physical logging of node modifications. Implement checkpoint mechanisms and recovery procedures handling incomplete operations during system crashes.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Lock-free complexity vs concurrency performance. MVCC overhead vs isolation guarantees. Memory usage for versioning vs query performance.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle B+ tree optimization for range queries with varying selectivity patterns?</li>
+                                <li>What's your strategy for B+ tree maintenance during bulk loading operations?</li>
+                                <li>How do you implement B+ tree compression for reducing storage overhead?</li>
+                                <li>How do you handle B+ tree rebalancing for skewed data distributions?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate B+ tree correctness under high concurrency without impacting performance?</li>
+                                <li>What strategies ensure B+ tree performance remains predictable under varying workloads?</li>
+                                <li>How do you monitor B+ tree health and detect structural anomalies or performance degradation?</li>
+                                <li>What's your approach for B+ tree stress testing and concurrency validation?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of concurrent tree algorithms and database system requirements.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="backtracking-strategies">
+                <h2>Backtracking Strategies</h2>
+                
+                <div class="question">
+                    <h3>Q6: Design optimized backtracking algorithms for automated test case generation in software testing, exploring complex state spaces with intelligent pruning and parallel exploration for comprehensive coverage.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement intelligent backtracking with constraint propagation, branch pruning heuristics, and parallel search strategies for automated test generation, using machine learning guidance and coverage-driven exploration for efficient test space coverage.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design constraint propagation backtracking using forward checking and arc consistency algorithms to eliminate infeasible branches early. Implement domain reduction techniques that propagate constraints through variable dependencies, reducing search space exponentially for complex test scenarios.</p>
+
+                            <p>Deploy intelligent pruning heuristics using machine learning models trained on successful test patterns. Implement variable ordering heuristics (most constraining variable, least constraining value) and branch ordering based on historical success rates and code coverage potential.</p>
+
+                            <p>Implement parallel backtracking using work-stealing deques where threads can steal unexplored branches from other threads. Design load balancing strategies accounting for varying branch exploration costs and dynamic work distribution based on search tree depth and branching factors.</p>
+
+                            <p>Deploy coverage-guided backtracking using code coverage feedback to prioritize unexplored code paths. Implement iterative deepening search with memory-bounded exploration, using beam search to maintain most promising partial solutions when memory limits are reached.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Pruning aggressiveness vs solution completeness. Parallel overhead vs exploration speedup. ML guidance accuracy vs exploration randomness.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle backtracking optimization for problems with dynamic constraints that change during exploration?</li>
+                                <li>What's your strategy for backtracking when solution quality varies significantly across different branches?</li>
+                                <li>How do you implement backtracking for multi-objective optimization with competing goals?</li>
+                                <li>How do you handle backtracking coordination across distributed testing environments?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate backtracking algorithm effectiveness without exhaustive solution verification?</li>
+                                <li>What strategies ensure backtracking performance scales with increasing problem complexity?</li>
+                                <li>How do you monitor backtracking progress and detect when algorithms need parameter adjustment?</li>
+                                <li>What's your approach for backtracking algorithm testing and convergence validation?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of backtracking optimization techniques and practical applications in automated testing.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="greedy-algorithm-patterns">
+                <h2>Greedy Algorithm Patterns</h2>
+                
+                <div class="question">
+                    <h3>Q7: Implement greedy algorithms for real-time resource scheduling in cloud computing platforms, optimizing for multiple objectives including cost, performance, and energy efficiency across thousands of servers.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design multi-objective greedy scheduling with approximation guarantees, adaptive heuristics, and online algorithms for real-time resource allocation, implementing sophisticated priority systems and performance prediction for optimal resource utilization.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design multi-objective greedy algorithm using weighted scoring functions combining cost ($/hour), performance (CPU/memory efficiency), and energy consumption (watts/operation). Implement adaptive weight adjustment based on current system state, time of day pricing, and carbon footprint objectives with configurable priority policies.</p>
+
+                            <p>Deploy online greedy algorithms handling job arrivals in real-time without knowing future requests. Implement competitive analysis ensuring greedy decisions achieve bounded approximation ratios compared to optimal offline solutions. Use exponential smoothing for performance prediction guiding greedy choices.</p>
+
+                            <p>Implement sophisticated tie-breaking mechanisms when multiple resources have similar greedy scores. Design secondary criteria including load balancing, locality preferences, and fault domain distribution ensuring system resilience while maintaining greedy optimization objectives.</p>
+
+                            <p>Deploy machine learning-enhanced greedy algorithms using reinforcement learning to adapt heuristic parameters based on historical performance. Implement multi-armed bandit approaches for exploring different greedy strategies while exploiting known good configurations during peak load periods.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Greedy speed vs global optimality. Multi-objective complexity vs decision simplicity. Online algorithm competitiveness vs offline optimal solutions.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle greedy algorithm adaptation when resource characteristics change dynamically?</li>
+                                <li>What's your strategy for greedy optimization when objectives conflict significantly?</li>
+                                <li>How do you implement greedy algorithms for batch processing vs interactive workloads?</li>
+                                <li>How do you handle greedy algorithm coordination across multi-region cloud deployments?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate greedy algorithm quality without comparing to exponentially expensive optimal solutions?</li>
+                                <li>What strategies ensure greedy algorithms maintain performance under varying load patterns?</li>
+                                <li>How do you monitor greedy decision quality and detect when heuristics need retuning?</li>
+                                <li>What's your approach for greedy algorithm experimentation and A/B testing?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize understanding of greedy algorithm limitations and practical optimization strategies.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="divide-conquer-optimization">
+                <h2>Divide & Conquer Optimization</h2>
+                
+                <div class="question">
+                    <h3>Q8: Optimize divide-and-conquer algorithms for large-scale data processing in distributed computing environments, implementing efficient work distribution, fault tolerance, and load balancing for petabyte-scale datasets.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design distributed divide-and-conquer with intelligent partitioning, adaptive load balancing, and fault-tolerant execution for large-scale data processing, implementing MapReduce optimizations and streaming divide-conquer for real-time processing.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design adaptive partitioning strategies using data characteristics and cluster capacity for optimal divide-and-conquer distribution. Implement cost-based partitioning considering data transfer overhead, computation complexity, and memory requirements. Use sampling techniques for estimating optimal partition sizes without processing entire datasets.</p>
+
+                            <p>Deploy fault-tolerant divide-and-conquer using checkpointing and speculative execution. Implement result caching for intermediate computations enabling recovery from partial failures without restarting entire jobs. Design redundant computation strategies where critical tasks run on multiple nodes with majority voting for result validation.</p>
+
+                            <p>Implement streaming divide-and-conquer for real-time data processing using sliding window techniques and incremental computation. Design online algorithms that maintain partial results and update them as new data arrives, avoiding expensive recomputation of entire partitions.</p>
+
+                            <p>Deploy advanced load balancing using work-stealing algorithms and dynamic repartitioning based on actual execution times. Implement prediction models for task duration estimation enabling proactive load balancing and stragglers mitigation through task migration and replication.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Partitioning overhead vs parallel efficiency. Fault tolerance redundancy vs resource utilization. Streaming complexity vs real-time processing capabilities.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle divide-and-conquer optimization for irregular data distributions and hotspots?</li>
+                                <li>What's your strategy for divide-and-conquer when problem decomposition is not naturally balanced?</li>
+                                <li>How do you implement divide-and-conquer for problems requiring global state or coordination?</li>
+                                <li>How do you handle divide-and-conquer scaling when cluster size changes dynamically?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate divide-and-conquer correctness for complex distributed computations?</li>
+                                <li>What strategies ensure divide-and-conquer performance scales linearly with cluster size?</li>
+                                <li>How do you monitor divide-and-conquer efficiency and detect load balancing issues?</li>
+                                <li>What's your approach for divide-and-conquer algorithm testing at petabyte scales?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of distributed computing challenges and scalability optimization techniques.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="bit-manipulation-techniques">
+                <h2>Bit Manipulation Techniques</h2>
+                
+                <div class="question">
+                    <h3>Q9: Design bit manipulation algorithms for efficient storage and querying of large-scale user permissions and feature flags systems, supporting billions of users with sub-millisecond lookup times and minimal memory overhead.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement bit-packed data structures with SIMD operations, hierarchical bitmaps, and compressed bit vectors for efficient permission checking and feature flag evaluation, using advanced bit manipulation techniques for space and time optimization.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design hierarchical bitmap structures using bit vectors at multiple granularity levels (user groups, individual users, permission categories). Implement compressed bit vectors using run-length encoding and bitmap compression (RLE, WAH) reducing memory footprint while maintaining fast random access for permission lookups.</p>
+
+                            <p>Deploy SIMD bit manipulation using AVX-512 for parallel permission checking across multiple users or permission sets. Implement vectorized population count (popcount), bit scanning (bsf/bsr), and bulk bit operations processing 512 bits per instruction for high-throughput permission evaluation.</p>
+
+                            <p>Implement Bloom filter-based negative lookups for permission checking, using multiple hash functions and bit manipulation for space-efficient false positive filtering. Design counting bloom filters using nibble/byte counters for supporting permission revocation without false negatives.</p>
+
+                            <p>Deploy bit manipulation tricks for efficient permission inheritance and role-based access control. Implement bit field arithmetic for combining permissions using bitwise OR for union, AND for intersection, and XOR for symmetric difference operations with bit masking for selective permission updates.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Memory compression vs random access performance. SIMD complexity vs throughput gains. False positive rates vs memory usage in bloom filters.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle bit manipulation optimization for sparse permission matrices with varying density?</li>
+                                <li>What's your strategy for bit manipulation when permission schemes change or expand over time?</li>
+                                <li>How do you implement bit manipulation for temporal permissions with expiration times?</li>
+                                <li>How do you handle bit manipulation coordination across distributed permission systems?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate bit manipulation correctness without exhaustive permission testing?</li>
+                                <li>What strategies ensure bit manipulation performance scales with increasing user and permission counts?</li>
+                                <li>How do you monitor bit manipulation efficiency and detect when data structures need optimization?</li>
+                                <li>What's your approach for bit manipulation algorithm testing and performance validation?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of low-level optimization techniques and their applications in large-scale systems.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="string-processing-patterns">
+                <h2>String Processing Patterns</h2>
+                
+                <div class="question">
+                    <h3>Q10: Implement high-performance string processing for log analysis systems processing terabytes of log data daily, supporting complex pattern matching, real-time parsing, and multi-language text processing with streaming capabilities.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design optimized string processing using finite automata, SIMD string operations, and streaming algorithms for large-scale log analysis, implementing efficient pattern matching, text normalization, and parallel processing for high-throughput log processing systems.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design finite automata-based pattern matching using Aho-Corasick algorithm for simultaneous multi-pattern search across thousands of log patterns. Implement optimized state transitions using lookup tables and failure functions enabling linear time complexity O(n + m) where n is text length and m is total pattern length.</p>
+
+                            <p>Deploy SIMD string processing using AVX-512 for parallel character comparison and string operations. Implement vectorized string scanning, case conversion, and delimiter detection processing 64 characters per instruction. Use bit manipulation for efficient whitespace trimming and character classification.</p>
+
+                            <p>Implement streaming string processing using incremental parsing and bounded memory consumption for processing unlimited log streams. Design circular buffer management for multi-line log record assembly and backtracking support for pattern matching across buffer boundaries.</p>
+
+                            <p>Deploy Unicode-aware text processing using UTF-8/UTF-16 efficient algorithms handling multi-byte character boundaries, normalization (NFC, NFD), and locale-specific operations. Implement language detection using n-gram analysis and character frequency patterns for international log processing.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Pattern matching speed vs memory usage for state tables. SIMD optimization vs code complexity. Unicode support overhead vs international compatibility.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle string processing optimization for varying log formats and schemas?</li>
+                                <li>What's your strategy for string processing when log volume spikes unpredictably?</li>
+                                <li>How do you implement string processing for structured vs unstructured log data?</li>
+                                <li>How do you handle string processing coordination across distributed log processing clusters?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate string processing accuracy for complex regex patterns and edge cases?</li>
+                                <li>What strategies ensure string processing performance remains stable under varying data characteristics?</li>
+                                <li>How do you monitor string processing efficiency and detect performance degradation?</li>
+                                <li>What's your approach for string processing algorithm benchmarking and optimization validation?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Emphasize understanding of string algorithm optimization and real-world text processing challenges.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="mathematical-problem-solving">
+                <h2>Mathematical Problem Solving</h2>
+                
+                <div class="question">
+                    <h3>Q11: Design mathematical algorithms for financial risk calculation systems requiring high precision arithmetic, complex probability distributions, and Monte Carlo simulations processing millions of portfolios with regulatory compliance requirements.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Implement high-precision mathematical algorithms using arbitrary precision arithmetic, optimized Monte Carlo methods, and parallel statistical computations for financial risk analysis, ensuring numerical stability and regulatory accuracy requirements.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design high-precision arithmetic using arbitrary precision libraries (GMP, MPFR) for financial calculations requiring exact decimal representation without floating-point errors. Implement custom fixed-point arithmetic for performance-critical calculations with configurable precision levels meeting regulatory requirements (typically 6-8 decimal places).</p>
+
+                            <p>Deploy optimized Monte Carlo simulations using variance reduction techniques (antithetic variates, control variates, stratified sampling) improving convergence rates by orders of magnitude. Implement parallel random number generation using counter-based RNGs (Philox, AES) ensuring reproducible results across distributed computations.</p>
+
+                            <p>Implement efficient probability distribution sampling using acceptance-rejection methods, Box-Muller transforms for Gaussian distributions, and inverse transform sampling for custom distributions. Design lookup table approximations for frequently used distribution functions balancing accuracy with computation speed.</p>
+
+                            <p>Deploy numerical optimization algorithms (quasi-Newton methods, conjugate gradient) for portfolio optimization problems with thousands of variables and constraints. Implement automatic differentiation for gradient computation enabling efficient sensitivity analysis and Greeks calculation for risk management.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Numerical precision vs computational performance. Monte Carlo accuracy vs simulation time. Parallel efficiency vs result reproducibility.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle mathematical algorithm validation for complex financial models with regulatory oversight?</li>
+                                <li>What's your strategy for mathematical computation when input data has varying quality and completeness?</li>
+                                <li>How do you implement mathematical algorithms for real-time risk calculation during market volatility?</li>
+                                <li>How do you handle mathematical algorithm coordination across global trading systems with different regulations?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate mathematical algorithm accuracy without access to analytical solutions?</li>
+                                <li>What strategies ensure mathematical computation performance scales with portfolio complexity increases?</li>
+                                <li>How do you monitor mathematical algorithm stability and detect numerical issues?</li>
+                                <li>What's your approach for mathematical algorithm testing and regulatory compliance validation?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Demonstrate understanding of numerical computation challenges and financial system requirements.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="concurrency-parallel-patterns">
+                <h2>Concurrency & Parallel Patterns</h2>
+                
+                <div class="question">
+                    <h3>Q12: Implement advanced concurrency patterns for high-frequency trading systems requiring nanosecond-level latency, lock-free data structures, and deterministic performance under extreme load with millions of operations per second.</h3>
+                    <div class="question-content">
+                        <div class="summary">
+                            <strong>Summary:</strong> Design lock-free concurrency using atomic operations, memory ordering guarantees, and cache-coherent data structures for ultra-low latency trading systems, implementing sophisticated thread coordination and memory management patterns.
+                        </div>
+
+                        <div class="deep-answer">
+                            <h4>Deep Answer:</h4>
+                            <p>Design lock-free data structures using compare-and-swap (CAS) loops with exponential backoff and memory ordering constraints (acquire, release, seq_cst). Implement ABA problem prevention using tagged pointers or hazard pointers for safe memory reclamation in high-frequency access patterns.</p>
+
+                            <p>Deploy cache-line optimization using false sharing prevention, prefetching strategies, and NUMA-aware memory allocation. Implement per-thread data structures with cross-thread communication using single-producer single-consumer (SPSC) queues minimizing cache coherency overhead.</p>
+
+                            <p>Implement deterministic thread scheduling using CPU affinity, real-time scheduling policies (SCHED_FIFO), and interrupt isolation. Design thread coordination patterns using futex-based synchronization, spin locks with adaptive spinning, and lock-free message passing for predictable latency characteristics.</p>
+
+                            <p>Deploy advanced memory management using thread-local allocators, memory pools with power-of-2 sizing, and garbage collection algorithms optimized for low-latency requirements. Implement epoch-based memory reclamation ensuring bounded memory usage without blocking operations.</p>
+                        </div>
+
+                        <div class="trade-offs">
+                            <strong>Trade-offs:</strong> Lock-free complexity vs latency predictability. Memory usage for thread-local storage vs false sharing prevention. Deterministic scheduling vs system throughput.
+                        </div>
+
+                        <div class="follow-ups">
+                            <h4>Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you handle concurrency pattern optimization for systems with varying thread counts and workloads?</li>
+                                <li>What's your strategy for concurrency when algorithms require global synchronization or coordination?</li>
+                                <li>How do you implement concurrency patterns for fault-tolerant systems requiring state consistency?</li>
+                                <li>How do you handle concurrency pattern coordination across distributed trading systems?</li>
+                            </ul>
+                            
+                            <h4>Non-Functional Follow-up Questions:</h4>
+                            <ul>
+                                <li>How do you validate concurrency correctness without introducing synchronization overhead during testing?</li>
+                                <li>What strategies ensure concurrency performance remains predictable under extreme load variations?</li>
+                                <li>How do you monitor concurrency health and detect race conditions or contention issues?</li>
+                                <li>What's your approach for concurrency algorithm stress testing and performance validation?</li>
+                            </ul>
+                        </div>
+
+                        <div class="interview-tip">
+                            <strong>Interview Tip:</strong> Show understanding of low-level concurrency mechanisms and their applications in performance-critical systems.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="study-guide">
+                <h2>How to Use This Study Guide</h2>
+                
+                <h3>Study Approach</h3>
+                <ul>
+                    <li>Practice pattern recognition by implementing algorithms from scratch across different problem domains</li>
+                    <li>Focus on optimization techniques and trade-offs rather than just correctness</li>
+                    <li>Study pattern applications in real-world systems and production environments</li>
+                    <li>Practice explaining algorithm choices in terms of business requirements and system constraints</li>
+                </ul>
+
+                <h3>Mock Interview Pacing</h3>
+                <ul>
+                    <li>Pattern identification and problem analysis (5 minutes)</li>
+                    <li>Algorithm design with complexity analysis and optimization considerations (15 minutes)</li>
+                    <li>Implementation of core algorithm with edge case handling (15 minutes)</li>
+                    <li>Discussion of scalability, testing, and production deployment (5 minutes)</li>
+                </ul>
+
+                <h3>Advanced Practice</h3>
+                <p>Focus on patterns that demonstrate system-level thinking: concurrency, distributed processing, performance optimization, and real-time constraints. Practice combining multiple patterns to solve complex problems efficiently.</p>
+
+                <h3>Interview Tips</h3>
+                <ul>
+                    <li>Start with brute force, then optimize using appropriate patterns</li>
+                    <li>Discuss time/space complexity at each optimization step</li>
+                    <li>Consider edge cases, error handling, and production concerns</li>
+                    <li>Explain pattern choices in context of system requirements</li>
+                    <li>Demonstrate understanding of when patterns don't apply</li>
+                </ul>
+            </div>
+        </main>
+
+        <a href="#" class="back-to-top">↑</a>
+    </div>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        window.addEventListener('scroll', function() {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+
+        document.querySelector('.back-to-top').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
