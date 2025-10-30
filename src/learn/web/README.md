@@ -1,4 +1,4 @@
-# Principal/Staff Engineer Study Guide - Web Version
+# Engineer Study Guide - Web Version
 
 A comprehensive, interactive study guide for senior engineering interviews at top tech companies, now available as a responsive web application.
 
@@ -71,6 +71,6 @@ To complete the full web version, create HTML files for:
 
 ---
 
-**Target Audience**: Senior Software Engineers preparing for Principal/Staff Engineer roles at FAANG and top tech companies.
+**Target Audience**: Senior Software Engineers preparing for Engineer roles at FAANG and top tech companies.
 
 **Content Quality**: 120+ interview questions with comprehensive technical depth, business context, and operational considerations.
