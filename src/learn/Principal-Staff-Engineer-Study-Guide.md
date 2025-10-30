@@ -1,6 +1,6 @@
 # Principal/Staff Engineer Interview Study Guide
 
-**Complete technical preparation for senior engineering roles at top tech companies**
+**Complete technical preparation for senior engineering roles**
 
 ## Table of Contents
 
@@ -10220,7 +10220,7 @@ Good luck with your interviews!
 
 ---
 
-*This study guide covers the essential technical and leadership areas for Principal/Staff Engineer interviews at top tech companies. Each section builds from foundational concepts to advanced implementations, providing both theoretical understanding and practical code examples.*
+*This study guide covers the essential technical and leadership areas for Engineer interviews. Each section builds from foundational concepts to advanced implementations, providing both theoretical understanding and practical code examples.*
 
 **Total Questions Covered: 16**
 - System Design: 3 questions

@@ -1,6 +1,6 @@
 # Engineer Study Guide - Web Version
 
-A comprehensive, interactive study guide for senior engineering interviews at top tech companies, now available as a responsive web application.
+A comprehensive, interactive study guide for senior engineering interviews, now available as a responsive web application.
 
 ## 📁 Web Structure
 
