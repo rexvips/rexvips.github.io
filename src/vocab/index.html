@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Word of the Day</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="main-title">
+                    <i class="fas fa-book-open"></i>
+                    Word of the Day
+                </h1>
+                <p class="subtitle">Expand your vocabulary, one word at a time</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Word Card -->
+            <div class="word-card" id="wordCard">
+                <div class="word-card-header">
+                    <div class="category-badge" id="categoryBadge">
+                        <i class="fas fa-star"></i>
+                        <span id="categoryText">Loading...</span>
+                    </div>
+                    <button class="refresh-btn" id="refreshBtn" title="Get new random word">
+                        <i class="fas fa-refresh"></i>
+                    </button>
+                </div>
+
+                <div class="word-main">
+                    <h2 class="word-title" id="wordTitle">Loading...</h2>
+                    <div class="word-pronunciation" id="wordPronunciation">
+                        <button class="pronunciation-btn" id="pronunciationBtn" title="Listen to pronunciation">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="word-definition">
+                    <h3>Definition</h3>
+                    <p id="wordMeaning">Loading definition...</p>
+                </div>
+
+                <div class="word-conversation">
+                    <h3>Example Conversation</h3>
+                    <div class="conversation-box">
+                        <div class="conversation-line speaker1">
+                            <div class="speaker-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="conversation-text" id="conversationSpeaker1">
+                                Loading conversation...
+                            </div>
+                        </div>
+                        <div class="conversation-line speaker2">
+                            <div class="speaker-icon">
+                                <i class="fas fa-user-friends"></i>
+                            </div>
+                            <div class="conversation-text" id="conversationSpeaker2">
+                                Loading response...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="word-similar">
+                    <h3>Similar Words</h3>
+                    <div class="similar-words-container" id="similarWordsContainer">
+                        <span class="similar-word">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="word-actions">
+                    <button class="action-btn favorite-btn" id="favoriteBtn" title="Add to favorites">
+                        <i class="far fa-heart"></i>
+                        <span>Favorite</span>
+                    </button>
+                    <button class="action-btn share-btn" id="shareBtn" title="Share this word">
+                        <i class="fas fa-share"></i>
+                        <span>Share</span>
+                    </button>
+                    <button class="action-btn study-btn" id="studyBtn" title="Study more words">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Study Mode</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="category-filter">
+                <h3>Choose Category</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-category="all" id="filterAll">
+                        <i class="fas fa-globe"></i>
+                        All Words
+                    </button>
+                    <button class="filter-btn" data-category="beginner" id="filterBeginner">
+                        <i class="fas fa-seedling"></i>
+                        Beginner
+                    </button>
+                    <button class="filter-btn" data-category="intermediate" id="filterIntermediate">
+                        <i class="fas fa-mountain"></i>
+                        Intermediate
+                    </button>
+                    <button class="filter-btn" data-category="expert" id="filterExpert">
+                        <i class="fas fa-crown"></i>
+                        Expert
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-section">
+                <h3>Your Progress</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="wordsLearned">0</div>
+                        <div class="stat-label">Words Learned</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="currentStreak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="favoriteCount">0</div>
+                        <div class="stat-label">Favorites</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalWords">300</div>
+                        <div class="stat-label">Total Words</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 Vocabulary Learning Hub. Expand your mind, one word at a time.</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">About</a>
+                <a href="#" class="footer-link">Help</a>
+                <a href="#" class="footer-link">Contact</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-book-open fa-spin"></i>
+            <p>Loading vocabulary...</p>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Notification message</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
